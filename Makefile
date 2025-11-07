@@ -1,5 +1,5 @@
 dev:
-	docker compose -f docker-compose.dev.yaml -f docker-compose.kratos.dev.yaml up -d
+	docker compose -f docker-compose.dev.yaml -f docker-compose.dev.kratos.yaml up -d
 	docker compose -f docker-compose.dev.yaml up -d
 
 prod:
@@ -7,7 +7,7 @@ prod:
 	docker compose -f docker-compose.prod.yaml up -d
 
 build-dev:
-	docker compose -f docker-compose.dev.yaml -f docker-compose.kratos.dev.yaml build
+	docker compose -f docker-compose.dev.yaml -f docker-compose.dev.kratos.yaml build
 	docker compose -f docker-compose.dev.yaml build
 
 build-prod:
@@ -15,5 +15,5 @@ build-prod:
 	docker compose -f docker-compose.prod.yaml build
 
 down:
-	docker compose -f docker-compose.dev.yaml -f docker-compose.kratos.dev.yaml down -v
+	docker compose -f docker-compose.dev.yaml -f docker-compose.dev.kratos.yaml down -v
 	docker compose -f docker-compose.prod.yaml -f docker-compose.prod.kratos.yaml down -v
