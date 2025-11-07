@@ -1,0 +1,26 @@
+{
+  "eslint.nodePath": "./node_modules",
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "eslint.options": {
+    "overrideConfigFile": "utils/linters/eslint.config.mjs"
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "typescriptreact"
+  ],
+  "stylelint.configFile": "utils/linters/.stylelintrc.json",
+  "stylelint.validate": ["css", "scss", "less", "postcss"],
+  "prettier.configPath": "utils/linters/.prettierrc.yaml",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  }
+}

@@ -1,0 +1,35 @@
+name: Build Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  trigger-build:
+    uses: alfa-hackers/workflows/.github/workflows/buildx-build.yaml@main
+    with:
+      image-name: ${{ github.repository }}/frontend
+    secrets:
+      personal_access_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+  trigger-cleanup:
+    needs: [trigger-build]
+    uses: alfa-hackers/workflows/.github/workflows/clean-registry.yaml@main
+    with:
+      owner: ${{ github.repository_owner }}
+      repository: frontend
+      package: frontend/frontend
+      keep_n_tagged: 2
+      dry_run: false
+    secrets:
+      personal_access_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+  deploy:
+    needs: [trigger-cleanup]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to environment
+        run: |
+          echo "Deploying application"
