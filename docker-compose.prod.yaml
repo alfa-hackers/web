@@ -6,8 +6,6 @@ services:
     ports:
       - '3001:3001'
 
-
-
   redis:
     image: 'docker.io/bitnami/redis:latest'
     container_name: redis
