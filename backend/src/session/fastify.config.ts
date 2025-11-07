@@ -7,8 +7,7 @@ import { join } from 'path'
 import { fastifyMultipart } from '@fastify/multipart'
 import { cookieConfig, multipartLimits } from './constants'
 
-const frontendUrl = process.env.FRONTEND_URL
-const allowedOrigins = frontendUrl.split(',').map((url) => url.trim())
+const allowedOrigins = ['*']
 
 export function registerFastifyPlugins(app) {
   app.register(fastifyMultipart, {

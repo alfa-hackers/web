@@ -4,11 +4,11 @@ dsn: postgres://kratos:secret@kratos-db:5432/kratos?sslmode=disable
 
 serve:
   public:
-    base_url: http://nestjs:4433/
+    base_url: http://localhost:4433/
     cors:
       enabled: true
       allowed_origins:
-        - http://nestjs:3000
+        - http://localhost:3000
         - http://127.0.0.1:3000
       allowed_methods:
         - GET
@@ -24,7 +24,7 @@ serve:
         - Set-Cookie
       allow_credentials: true
   admin:
-    base_url: http://nestjs:4434/
+    base_url: http://localhost:4434/
 
 identity:
   default_schema_id: default
@@ -33,13 +33,13 @@ identity:
       url: file:///etc/config/kratos/identity.default.schema.json
 
 selfservice:
-  default_browser_return_url: http://nestjs:3000
+  default_browser_return_url: http://localhost:3000
   flows:
     login:
-      ui_url: http://nestjs:3000/login
+      ui_url: http://localhost:3000/login
       lifespan: 10m
     registration:
-      ui_url: http://nestjs:3000/register
+      ui_url: http://localhost:3000/register
       lifespan: 10m
       after:
         password:
@@ -47,7 +47,7 @@ selfservice:
             - hook: session
     logout:
       after:
-        default_browser_return_url: http://nestjs:3000
+        default_browser_return_url: http://localhost:3000
   methods:
     password:
       enabled: true
@@ -55,7 +55,7 @@ selfservice:
 session:
   lifespan: 768h
   cookie:
-    domain: nestjs
+    domain: localhost
     same_site: Lax
     path: /
 

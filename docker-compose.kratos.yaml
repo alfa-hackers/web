@@ -8,7 +8,7 @@ services:
     command: ['migrate', 'sql', '-e', '--yes']
     restart: 'on-failure'
     networks:
-      - kratos-net
+      - app
 
   kratos:
     image: oryd/kratos:v1.2.0
@@ -20,18 +20,18 @@ services:
     environment:
       - DSN=postgres://kratos:secret@kratos-db:5432/kratos?sslmode=disable
       - LOG_LEVEL=debug
-      - SERVE_PUBLIC_BASE_URL=http://nestjs:4433/
-      - SERVE_ADMIN_BASE_URL=http://nestjs:4434/
-      - KRATOS_BROWSER_UI_URL=http://nestjs:3000/
-      - KRATOS_PUBLIC_URL=http://nestjs:4433/
-      - KRATOS_ADMIN_URL=http://nestjs:4434/
-      - KRATOS_DOMAIN=nestjs
+      - SERVE_PUBLIC_BASE_URL=http://kratos:4433/
+      - SERVE_ADMIN_BASE_URL=http://kratos:4434/
+      - KRATOS_BROWSER_UI_URL=http://kratos:3001/
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_ADMIN_URL=http://kratos:4434/
+      - KRATOS_DOMAIN=kratos
     volumes:
-      - ./.config/kratos:/etc/config/kratos
+      - ./config/prod/kratos:/etc/config/kratos
     command: serve --dev --config /etc/config/kratos/kratos.yml
     restart: unless-stopped
     networks:
-      - kratos-net
+      - app
 
   kratos-db:
     image: postgres:16-alpine
@@ -43,11 +43,14 @@ services:
     volumes:
       - kratos-db-data:/var/lib/postgresql/data
     networks:
-      - kratos-net
+      - app
 
 networks:
-  kratos-net:
+  app:
     driver: bridge
-
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.100.0/24
 volumes:
   kratos-db-data:

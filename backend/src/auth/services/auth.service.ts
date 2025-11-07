@@ -17,10 +17,10 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {
-    this.kratosPublicUrl = process.env.KRATOS_PUBLIC_URL || 'http://localhost:4433'
+    this.kratosPublicUrl = process.env.KRATOS_PUBLIC_URL
 
     const adminConfig = new Configuration({
-      basePath: process.env.KRATOS_ADMIN_URL || 'http://localhost:4434',
+      basePath: process.env.KRATOS_ADMIN_URL,
       baseOptions: { timeout: 5000 },
     })
 
