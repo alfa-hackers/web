@@ -12,18 +12,24 @@ import { Logger } from '@nestjs/common'
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap')
-
+  const nodeEnv = process.env.NODE_ENV
+  let baseUrl
   logger.log(cliColor.green('✅ Starting NestJS (Fastify) application...'))
   logger.log('')
 
-  const host = process.env.HOST || '0.0.0.0'
+  const host = process.env.HOST
   const port = parseInt(process.env.BACKEND_PORT)
-  const baseUrl = `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`
+
+  if (nodeEnv === 'production') {
+    baseUrl = `https://${host}:${port}`
+  } else {
+    baseUrl = `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`
+  }
 
   const fastifyInstance = Fastify({
     logger: false,
-    bodyLimit: parseInt(process.env.BODY_LIMIT || '104857600', 10),
-    connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT || '300000', 10),
+    bodyLimit: parseInt(process.env.BODY_LIMIT, 10),
+    connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT, 10),
   })
 
   const app = await NestFactory.create<NestFastifyApplication>(

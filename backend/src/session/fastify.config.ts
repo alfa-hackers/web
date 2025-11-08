@@ -40,7 +40,7 @@ export function registerFastifyPlugins(app) {
   })
 
   app.register(fastifySession, {
-    secret: process.env.SESSION_SECRET || 'supersecret',
+    secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     cookie: cookieConfig,
     store: redisStore,
