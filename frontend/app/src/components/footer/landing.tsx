@@ -53,6 +53,8 @@ const ChatLanding: React.FC = () => {
     }
   }
 
+ const hasMessages = currentChat?.messages && currentChat.messages.length > 0
+
   return (
     <div className="chat-landing">
       <button
@@ -108,115 +110,87 @@ const ChatLanding: React.FC = () => {
         </div>
       </aside>
 
-      <main className="viewport">
-        {!currentChat && !isCreatingNew ? (
-          <>
-            <div className="welcome">
-              <h1>Добро пожаловать</h1>
-              <p>Начните новый чат прямо сейчас</p>
+      <main className={`viewport ${hasMessages ? 'has-messages' : ''}`}>
+        {!hasMessages && (
+          <div className="welcome">
+            <h1>Добро пожаловать</h1>
+            <p>Чем я могу вам помочь?</p>
 
-              {!isConnected && (
-                <div className="connection-warning">
-                  ⚠️ Нет подключения к серверу
-                </div>
-              )}
-            </div>
-
-            <div className="input-area">
-              <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={
-                  isConnected
-                    ? 'Введите сообщение...'
-                    : 'Ожидание подключения...'
-                }
-                rows={1}
-                disabled={!isConnected}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim() || !isConnected}
-              >
-                {isConnected ? 'Отправить' : 'Подключение...'}
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="messages">
-              {currentChat?.messages.map((message) => (
-                <div key={message.id} className={`message ${message.sender}`}>
-                  <div className="message-avatar">
-                    {message.sender === 'user' ? '👤' : '🤖'}
-                  </div>
-                  <div className="message-bubble">
-                    <div className="message-content">{message.content}</div>
-
-                    {message.status && message.sender === 'user' && (
-                      <div className="message-status">
-                        {message.status === 'sending' && (
-                          <span className="status-sending">⏳ Отправка...</span>
-                        )}
-                        {message.status === 'sent' && (
-                          <span className="status-sent">✓</span>
-                        )}
-                        {message.status === 'error' && (
-                          <span className="status-error">❌ Ошибка</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {currentChat?.messages &&
-                currentChat.messages.length > 0 &&
-                currentChat.messages[currentChat.messages.length - 1].sender ===
-                  'user' &&
-                currentChat.messages[currentChat.messages.length - 1].status ===
-                  'sent' &&
-                isWaitingForResponse && (
-                  <div className="message assistant typing">
-                    <div className="message-avatar">🤖</div>
-                    <div className="message-bubble">
-                      <div className="typing-indicator">
-                        <span />
-                        <span />
-                        <span />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div className="input-area">
-              <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={
-                  isWaitingForResponse
-                    ? 'Ожидание ответа...'
-                    : isConnected
-                    ? 'Введите сообщение...'
-                    : 'Ожидание подключения...'
-                }
-                rows={1}
-                disabled={!isConnected || isWaitingForResponse}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim() || !isConnected || isWaitingForResponse}
-              >
-                {isWaitingForResponse ? '⏳' : isConnected ? '↑' : '⌛'}
-              </button>
-            </div>
-          </>
+            {!isConnected && (
+              <div className="connection-warning">
+                ⚠️ Нет подключения к серверу
+              </div>
+            )}
+          </div>
         )}
+
+        {hasMessages && (
+          <div className="messages">
+            {currentChat?.messages.map((message) => (
+              <div key={message.id} className={`message ${message.sender}`}>
+                {message.sender === 'user' && (
+                  <div className="message-avatar">👤</div>
+                )}
+                <div className="message-bubble">
+                  <div className="message-content">{message.content}</div>
+
+                  {message.status && message.sender === 'user' && (
+                    <div className="message-status">
+                      {message.status === 'sending' && (
+                        <span className="status-sending">⏳ Отправка...</span>
+                      )}
+                      {message.status === 'sent' && (
+                        <span className="status-sent">✓</span>
+                      )}
+                      {message.status === 'error' && (
+                        <span className="status-error">❌ Ошибка</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {isWaitingForResponse && (
+              <div className="message assistant typing">
+                <div className="message-bubble">
+                  <div className="typing-indicator">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+
+        <div className={`input-area ${!hasMessages ? 'centered' : ''}`}>
+          <div className="input-wrapper">
+            <textarea
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={
+                isWaitingForResponse
+                  ? 'Ожидание ответа...'
+                  : isConnected
+                  ? 'Задайте вопрос...'
+                  : 'Ожидание подключения...'
+              }
+              rows={1}
+              disabled={!isConnected || isWaitingForResponse}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || !isConnected || isWaitingForResponse}
+            >
+              {isWaitingForResponse ? '⏳' : isConnected ? '↑' : '⌛'}
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   )
