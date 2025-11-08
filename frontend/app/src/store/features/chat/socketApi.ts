@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { io, Socket } from 'socket.io-client'
 import { AppDispatch } from '../../store'
 import { addAssistantMessage, updateMessageStatus } from './chatSlice'
@@ -12,12 +10,16 @@ class SocketApi {
     if (this.socket?.connected) return
     this.dispatch = dispatch
 
-    this.socket = io(process.env.REACT_APP_SOCKET_URL || 'ws://localhost:3000', {
+    const isDev = process.env.NODE_ENV === 'development'
+    const getSocketUrl = () => (isDev ? 'http://localhost:3000' : 'wss://api.whirav.ru')
+
+    this.socket = io(getSocketUrl(), {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       timeout: 10000,
+      secure: !isDev,
     })
 
     this.socket.on('message', (data: { userId: string; message: string }) => {

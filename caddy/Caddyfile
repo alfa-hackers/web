@@ -10,3 +10,6 @@ dev.whirav.ru {
 	reverse_proxy app:3001
 }
 
+api.whirav.ru {
+    reverse_proxy nestjs:3000
+}

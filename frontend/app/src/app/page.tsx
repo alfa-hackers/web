@@ -3,7 +3,6 @@
 import React, { useRef } from 'react'
 import { Provider } from 'react-redux'
 import { store } from '@/store/store'
-import MainLayout from '@/components/pages/landing'
 import ChatLanding from '../components/footer/landing'
 import '@/styles/Global/index.scss'
 
@@ -12,7 +11,7 @@ export default function Home() {
 
   return (
     <Provider store={store}>
-      <div style={{ height: '3000px' }}>
+      <div>
         <div ref={mainContentRef}>
           <ChatLanding />
         </div>
