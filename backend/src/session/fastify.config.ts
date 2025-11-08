@@ -10,19 +10,21 @@ import { cookieConfig, multipartLimits } from './constants'
 const allowedOrigins = ['*']
 
 export function registerFastifyPlugins(app) {
-  app.register(fastifyMultipart, {
+  const fastify = app.getHttpAdapter().getInstance()
+
+  fastify.register(fastifyMultipart, {
     limits: multipartLimits,
   })
 
-  app.register(fastifyCors, {
+  fastify.register(fastifyCors, {
     origin: allowedOrigins,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
   })
 
-  app.register(fastifyCookie)
+  fastify.register(fastifyCookie)
 
-  app.register(fastifyStatic, {
+  fastify.register(fastifyStatic, {
     root: join(process.cwd(), 'uploads'),
     prefix: '/uploads/',
     acceptRange: true,
@@ -30,7 +32,7 @@ export function registerFastifyPlugins(app) {
     maxAge: '1d',
   })
 
-  app.register(fastifyStatic, {
+  fastify.register(fastifyStatic, {
     root: join(process.cwd(), 'static'),
     prefix: '/static/',
     acceptRange: true,
@@ -39,10 +41,17 @@ export function registerFastifyPlugins(app) {
     decorateReply: false,
   })
 
-  app.register(fastifySession, {
+  fastify.register(fastifySession, {
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     cookie: cookieConfig,
     store: redisStore,
+  })
+
+  fastify.addHook('onRequest', async (req, res) => {
+    if (req.session) {
+      req.session.touch?.()
+      await req.session.save?.()
+    }
   })
 }
