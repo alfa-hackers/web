@@ -1,0 +1,12 @@
+{
+	email sacracorvus@gmail.com
+}
+
+portainer.whirav.ru {
+	reverse_proxy portainer:9000
+}
+
+dev.whirav.ru {
+	reverse_proxy app:3001
+}
+

@@ -114,7 +114,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           headers: {
             Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': process.env.APP_URL || 'http://nestjs:3000',
+            'HTTP-Referer': process.env.BACKEND_URL || 'http://localhost:3000',
             'X-Title': 'NestJS WebSocket Chat',
           },
           timeout: 30000,

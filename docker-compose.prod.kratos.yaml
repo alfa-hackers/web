@@ -8,7 +8,7 @@ services:
     command: ['migrate', 'sql', '-e', '--yes']
     restart: 'on-failure'
     networks:
-      - app
+      - caddy
 
   kratos:
     image: oryd/kratos:v1.2.0
@@ -31,7 +31,7 @@ services:
     command: serve --dev --config /etc/config/kratos/kratos.yml
     restart: unless-stopped
     networks:
-      - app
+      - caddy
 
   kratos-db:
     image: postgres:16-alpine
@@ -43,10 +43,10 @@ services:
     volumes:
       - kratos-db-data:/var/lib/postgresql/data
     networks:
-      - app
+      - caddy
 
 networks:
-  app:
+  caddy:
     driver: bridge
     ipam:
       driver: default

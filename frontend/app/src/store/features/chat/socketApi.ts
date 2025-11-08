@@ -12,8 +12,8 @@ class SocketApi {
     if (this.socket?.connected) return
     this.dispatch = dispatch
 
-    this.socket = io('ws://nestjs:3000', {
-      transports: ['websocket'],
+    this.socket = io(process.env.REACT_APP_SOCKET_URL || 'ws://localhost:3000', {
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
