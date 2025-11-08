@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 import { AppDispatch } from '../../store'
-import { addAssistantMessage, updateMessageStatus } from './chatSlice'
+import { addAssistantMessage, updateMessageStatus, setWaitingForResponse } from './chatSlice'
 
 class SocketApi {
   private socket: Socket | null = null
@@ -37,11 +37,13 @@ class SocketApi {
     this.socket?.emit('leaveRoom', { roomId })
   }
 
-  sendMessage(roomId: string, message: string, messageId: string) {
+  sendMessage(roomId: string, message: string, messageId: string, chatId: string) {
     if (!this.socket?.connected && this.dispatch) {
       this.dispatch(updateMessageStatus({ messageId, status: 'error' }))
+      this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
       return
     }
+    
     this.socket?.emit('sendMessage', { roomId, message }, (response: any) => {
       if (this.dispatch) {
         this.dispatch(
@@ -50,6 +52,10 @@ class SocketApi {
             status: response.success ? 'sent' : 'error',
           })
         )
+        
+        if (!response.success) {
+          this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
+        }
       }
     })
   }

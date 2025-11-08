@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { useEffect, useCallback, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../hooks'
 import { socketApi } from './socketApi'
@@ -51,13 +49,13 @@ export const useWebSocket = () => {
           const newActiveChat = state?.chat?.chats[0]
           if (newActiveChat) {
             const messageId = newActiveChat.messages[0]?.id
-            socketApi.sendMessage(newActiveChat.roomId, content, messageId)
+            socketApi.sendMessage(newActiveChat.roomId, content, messageId, newActiveChat.id)
           }
         }, 0)
       } else {
         dispatch(addMessage({ chatId: activeChat.id, content }))
         const messageId = `msg_${Date.now()}`
-        socketApi.sendMessage(activeChat.roomId, content, messageId)
+        socketApi.sendMessage(activeChat.roomId, content, messageId, activeChat.id)
       }
     },
     [activeChat, dispatch]

@@ -10,6 +10,7 @@ export interface Chat {
   title: string
   messages: Message[]
   roomId: string
+  isWaitingForResponse?: boolean
 }
 
 export interface ChatState {

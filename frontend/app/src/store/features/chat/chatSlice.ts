@@ -18,6 +18,7 @@ const chatSlice = createSlice({
         id: Date.now().toString(),
         title: action.payload.content.slice(0, 30) || 'Новый чат',
         roomId,
+        isWaitingForResponse: true,
         messages: [
           {
             id: messageId,
@@ -38,6 +39,7 @@ const chatSlice = createSlice({
     ) => {
       const chat = state.chats.find((c) => c.id === action.payload.chatId)
       if (chat) {
+        chat.isWaitingForResponse = true
         chat.messages.push({
           id: `msg_${Date.now()}`,
           content: action.payload.content,
@@ -54,6 +56,7 @@ const chatSlice = createSlice({
       if (state.activeChat) {
         const chat = state.chats.find((c) => c.id === state.activeChat)
         if (chat) {
+          chat.isWaitingForResponse = false
           chat.messages.push({
             id: `msg_${Date.now()}`,
             content: action.payload.content,
@@ -82,6 +85,16 @@ const chatSlice = createSlice({
       }
     },
 
+    setWaitingForResponse: (
+      state,
+      action: PayloadAction<{ chatId: string; isWaiting: boolean }>
+    ) => {
+      const chat = state.chats.find((c) => c.id === action.payload.chatId)
+      if (chat) {
+        chat.isWaitingForResponse = action.payload.isWaiting
+      }
+    },
+
     setActiveChat: (state, action: PayloadAction<string | null>) => {
       state.activeChat = action.payload
       state.isCreatingNew = false
@@ -104,6 +117,7 @@ export const {
   addMessage,
   addAssistantMessage,
   updateMessageStatus,
+  setWaitingForResponse,
   setActiveChat,
   setCreatingNew,
   deleteChat,

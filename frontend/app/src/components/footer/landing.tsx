@@ -18,10 +18,8 @@ const ChatLanding: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Инициализация WebSocket
   const { sendMessage, isConnected } = useWebSocket()
 
-  // Автоскролл к последнему сообщению
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
@@ -32,10 +30,11 @@ const ChatLanding: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim() || !isConnected) return
+  const currentChat = chats.find((chat) => chat.id === activeChat)
+  const isWaitingForResponse = currentChat?.isWaitingForResponse || false
 
-    // Отправка через WebSocket
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || !isConnected || isWaitingForResponse) return
     sendMessage(inputValue)
     setInputValue('')
   }
@@ -53,8 +52,6 @@ const ChatLanding: React.FC = () => {
       dispatch(deleteChat(chatId))
     }
   }
-
-  const currentChat = chats.find((chat) => chat.id === activeChat)
 
   return (
     <div className="chat-landing">
@@ -79,7 +76,6 @@ const ChatLanding: React.FC = () => {
             Новый чат
           </button>
 
-          {/* Индикатор подключения */}
           <div
             className={`connection-indicator ${isConnected ? 'connected' : 'disconnected'}`}
           >
@@ -158,7 +154,6 @@ const ChatLanding: React.FC = () => {
                   <div className="message-bubble">
                     <div className="message-content">{message.content}</div>
 
-                    {/* Статус сообщения */}
                     {message.status && message.sender === 'user' && (
                       <div className="message-status">
                         {message.status === 'sending' && (
@@ -176,13 +171,13 @@ const ChatLanding: React.FC = () => {
                 </div>
               ))}
 
-              {/* Индикатор печатания AI (опционально) */}
               {currentChat?.messages &&
                 currentChat.messages.length > 0 &&
                 currentChat.messages[currentChat.messages.length - 1].sender ===
                   'user' &&
                 currentChat.messages[currentChat.messages.length - 1].status ===
-                  'sent' && (
+                  'sent' &&
+                isWaitingForResponse && (
                   <div className="message assistant typing">
                     <div className="message-avatar">🤖</div>
                     <div className="message-bubble">
@@ -204,18 +199,20 @@ const ChatLanding: React.FC = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={
-                  isConnected
+                  isWaitingForResponse
+                    ? 'Ожидание ответа...'
+                    : isConnected
                     ? 'Введите сообщение...'
                     : 'Ожидание подключения...'
                 }
                 rows={1}
-                disabled={!isConnected}
+                disabled={!isConnected || isWaitingForResponse}
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputValue.trim() || !isConnected}
+                disabled={!inputValue.trim() || !isConnected || isWaitingForResponse}
               >
-                {isConnected ? '↑' : '⌛'}
+                {isWaitingForResponse ? '⏳' : isConnected ? '↑' : '⌛'}
               </button>
             </div>
           </>
