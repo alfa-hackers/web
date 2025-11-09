@@ -39,3 +39,9 @@ next-env.d.ts
 *.*~
 
 **/dist/
+
+#vscode
+.vscode
+
+#ci/cd
+.github
