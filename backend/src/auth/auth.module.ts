@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { AuthController } from './auth.controller'
 import { AuthService } from './services'
 import { SessionGuard } from './guards/session.guard'
-import { User } from 'src/domain/user/user'
+import { User } from 'src/domain/user.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), ConfigModule],

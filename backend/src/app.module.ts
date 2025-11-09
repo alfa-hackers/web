@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module'
 import { HealthModule } from './health/health.module'
 import { DatabaseModule } from './adapters/database.module'
 import { SocketModule } from './socket/socket.module'
+import { MessagesModule } from './all_messages/messages.module'
 
 @Module({
   controllers: [],
@@ -19,6 +20,7 @@ import { SocketModule } from './socket/socket.module'
     HealthModule,
     DatabaseModule,
     SocketModule,
+    MessagesModule
   ],
 })
 export class AppModule {}

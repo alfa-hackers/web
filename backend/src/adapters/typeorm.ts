@@ -1,6 +1,9 @@
 import 'reflect-metadata'
+import { Message } from 'src/domain/message.entity'
+import { Room } from 'src/domain/room.entity'
+import { UserRoom } from 'src/domain/user-room.entity'
+import { User } from 'src/domain/user.entity'
 import { DataSource } from 'typeorm'
-import { User } from 'src/domain/user/user'
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -8,7 +11,7 @@ export const AppDataSource = new DataSource({
   synchronize: true,
   migrationsRun: true,
   logging: true,
-  entities: [User],
+  entities: [User, Message, Room, UserRoom],
   migrations: ['dist/migrations/*.js'],
   ssl: false,
 })

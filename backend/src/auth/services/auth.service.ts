@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { AuthDto, LoginDto } from '../dto'
 import { Configuration, IdentityApi, FrontendApi } from '@ory/kratos-client'
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { User } from 'src/domain/user/user'
+import { User } from 'src/domain/user.entity'
 import axios from 'axios'
 
 @Injectable()
