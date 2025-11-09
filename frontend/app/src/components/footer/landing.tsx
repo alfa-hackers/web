@@ -77,13 +77,6 @@ const ChatLanding: React.FC = () => {
             <span className="plus-icon">+</span>
             Новый чат
           </button>
-
-          <div
-            className={`connection-indicator ${isConnected ? 'connected' : 'disconnected'}`}
-          >
-            <span className="status-dot" />
-            {isConnected ? 'Подключено' : 'Отключено'}
-          </div>
         </div>
 
         <div className="chat-history">
@@ -167,7 +160,14 @@ const ChatLanding: React.FC = () => {
           </div>
         )}
 
+        
         <div className={`input-area ${!hasMessages ? 'centered' : ''}`}>
+          <div
+            className={`status-panel 
+              ${isConnected ? 'connected' : 'disconnected'} 
+              ${!hasMessages ? 'centered' : ''}`}
+          >
+          </div>
           <div className="input-wrapper">
             <textarea
               value={inputValue}
