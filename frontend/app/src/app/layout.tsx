@@ -4,11 +4,11 @@ import '@/styles/Global/index.scss'
 import Head from 'next/head'
 
 export const metadata: Metadata = {
-  title: '🚀 Revolutionary AI Bot | Your Personal Genius Unleashed',
+  title: 'Revolutionary AI Bot | Your Personal Genius Unleashed',
   description:
     '⚡ Lightning-fast. 🧠 Mind-blowing smart. 💎 Insanely accurate. Experience the AI that doesnt just answer—it transforms how you work, create, and think. From coding wizardry to creative breakthroughs, this is the assistant that redefines possible. Try it now and feel the future.',
   openGraph: {
-    title: '🚀 Revolutionary AI Bot | Your Personal Genius Unleashed',
+    title: 'Revolutionary AI Bot | Your Personal Genius Unleashed',
     description:
       '⚡ Lightning-fast. 🧠 Mind-blowing smart. 💎 Insanely accurate. Experience the AI that doesnt just answer—it transforms how you work, create, and think. From coding wizardry to creative breakthroughs, this is the assistant that redefines possible. Try it now and feel the future.',
     url: 'https://dev.whirav.ru/',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '🚀 Revolutionary AI Bot | Your Personal Genius Unleashed',
+    title: 'Revolutionary AI Bot | Your Personal Genius Unleashed',
     description:
       '⚡ Lightning-fast. 🧠 Mind-blowing smart. 💎 Insanely accurate. Experience the AI that doesnt just answer—it transforms how you work, create, and think. From coding wizardry to creative breakthroughs, this is the assistant that redefines possible. Try it now and feel the future.',
     images: [

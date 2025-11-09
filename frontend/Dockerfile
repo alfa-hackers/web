@@ -14,11 +14,7 @@ FROM base AS runner
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
-COPY --from=1 /app/app/.next ./app/.next
-COPY --from=1 /app/app/public ./app/public
-COPY --from=1 /app/app/package.json ./app/package.json
-COPY --from=1 /app/app/node_modules ./app/node_modules
-COPY --from=1 /app/node_modules ./node_modules
+COPY --from=1 /app .
 
 USER nextjs
 WORKDIR /app/app
