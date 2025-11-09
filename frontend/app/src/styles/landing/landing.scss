@@ -2,11 +2,10 @@
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: #0f0f0f;
+  background: #f2f3f5;
   color: #fff;
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
+    Arial, Helvetica, sans-serif;
   position: relative;
 }
 
@@ -41,7 +40,7 @@
 
 .sidebar {
   width: 260px;
-  background: #171717;
+  background: #d1d5d8;
   border-right: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
@@ -63,7 +62,7 @@
     background: transparent;
     border: 1px solid #3a3a3a;
     border-radius: 8px;
-    color: #fff;
+    color: #000000;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
@@ -76,6 +75,7 @@
     &:hover {
       background: #2a2a2a;
       border-color: #4a4a4a;
+      color: #FFFFFF;
     }
   }
 
@@ -115,6 +115,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: #000000;
       }
 
       .delete-chat-btn {
@@ -124,7 +125,7 @@
         height: 24px;
         border: none;
         background: rgb(239, 68, 68, 0.1);
-        color: #ef4444;
+        color: #EF3124;
         border-radius: 4px;
         cursor: pointer;
         font-size: 20px;
@@ -143,13 +144,26 @@
       &:hover {
         background: #2a2a2a;
 
+        .chat-title {
+          color: #FFFFFF;
+        }
+
         .delete-chat-btn {
           opacity: 1;
         }
       }
 
       &.active {
-        background: #2a2a2a;
+        background: transparent;
+        border: 1px solid #EF3124;
+
+          &:hover {
+          background: #2a2a2a;
+
+          .chat-title {
+            color: #FFFFFF;
+          }
+        }
 
         .delete-chat-btn {
           opacity: 0.7;
@@ -194,14 +208,14 @@
       font-size: 48px;
       font-weight: 600;
       margin-bottom: 16px;
-      background: linear-gradient(90deg, #fff, #888);
+      background: #000000;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     p {
       font-size: 18px;
-      color: #888;
+      color: #000000;
       margin-bottom: 24px;
     }
 
@@ -241,6 +255,10 @@
       gap: 12px;
       animation: fadeIn 0.3s;
       width: 100%;
+      background: #d1d5d8;
+      padding: 20px;
+      border-radius: 20px;
+      
 
       &.user {
         flex-direction: row;
@@ -252,7 +270,7 @@
         .message-bubble {
           order: 2;
           background: transparent;
-          color: #fff;
+          color: #FFFFFF;
           padding: 0;
         }
       }
@@ -262,7 +280,7 @@
 
         .message-bubble {
           background: transparent;
-          color: #e0e0e0;
+          color: #FFFFFF;
           padding: 0;
         }
       }
@@ -292,7 +310,7 @@
       .message-content {
         font-size: 16px;
         line-height: 1.6;
-        color: #e0e0e0;
+        color: #000000;
       }
 
       .message-status {
@@ -304,15 +322,15 @@
         gap: 4px;
 
         .status-sending {
-          color: #fbbf24;
+          color: #94999C;
         }
 
         .status-sent {
-          color: #4ade80;
+          color: #94999C;
         }
 
         .status-error {
-          color: #ef4444;
+          color: #94999C;
         }
       }
     }
@@ -350,13 +368,13 @@
       }
 
       &.connected {
-        color: #4ade80;
-        background: #4ade80;
+        color: #ef4444;
+        background: #ef4444;
       }
 
       &.disconnected {
-        color: #ef4444;
-        background: #ef4444;
+        color: #d1d5d8;
+        background: #d1d5d8;
       }
     }
 
@@ -365,7 +383,7 @@
       max-width: 800px;
       display: flex;
       gap: 12px;
-      background: #2a2a2a;
+      background: #FFFFFF;
       border-radius: 24px;
       padding: 4px;
       border: 1px solid #3a3a3a;
@@ -382,7 +400,7 @@
       background: transparent;
       border: none;
       padding: 14px 16px;
-      color: #fff;
+      color: #000000;
       font-size: 16px;
       font-family: inherit;
       resize: none;
@@ -403,10 +421,10 @@
     button {
       width: 44px;
       height: 44px;
-      background: #fff;
+      background: #94999C;
       border: none;
       border-radius: 20px;
-      color: #0f0f0f;
+      color: #d1d5d8;
       font-size: 20px;
       font-weight: 500;
       cursor: pointer;
@@ -419,7 +437,7 @@
       margin: 4px;
 
       &:hover:not(:disabled) {
-        background: #e0e0e0;
+        background: #EF3124;
         transform: scale(1.05);
       }
 
