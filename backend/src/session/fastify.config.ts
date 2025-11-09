@@ -7,7 +7,7 @@ import { join } from 'path'
 import { fastifyMultipart } from '@fastify/multipart'
 import { cookieConfig, multipartLimits } from './constants'
 
-const allowedOrigins = ['*']
+const allowedOrigins = ['https://dev.whirav.ru', 'https://whirav.ru', 'http://localhost:3000']
 
 export function registerFastifyPlugins(app) {
   const fastify = app.getHttpAdapter().getInstance()

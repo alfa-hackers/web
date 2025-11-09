@@ -21,6 +21,26 @@ const ChatLanding: React.FC = () => {
   const { sendMessage, isConnected } = useWebSocket()
 
   useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const response = await fetch('https://api.whirav.ru/health', {
+          method: 'GET',
+          credentials: 'include',
+          mode: 'cors',
+        })
+        if (response.ok) {
+          const data = await response.json()
+          console.log('Health check успешен', data)
+        }
+      } catch (error) {
+        console.error('Ошибка health check:', error)
+      }
+    }
+
+    checkHealth()
+  }, [])
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
 
@@ -53,7 +73,7 @@ const ChatLanding: React.FC = () => {
     }
   }
 
- const hasMessages = currentChat?.messages && currentChat.messages.length > 0
+  const hasMessages = currentChat?.messages && currentChat.messages.length > 0
 
   return (
     <div className="chat-landing">
@@ -160,7 +180,6 @@ const ChatLanding: React.FC = () => {
           </div>
         )}
 
-        
         <div className={`input-area ${!hasMessages ? 'centered' : ''}`}>
           <div
             className={`status-panel 
