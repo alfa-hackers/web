@@ -44,6 +44,7 @@ export function registerFastifyPlugins(app) {
   fastify.register(fastifySession, {
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
+    cookieName: 'fastify_temp_session',
     cookie: cookieConfig,
     store: redisStore,
   })

@@ -55,7 +55,7 @@ export class RoomService {
     if (!room) {
       room = this.roomRepository.create({
         id: roomId,
-        name: `Room ${roomId}`,
+        name: roomId.toString(),
         ownerId: dbUserId,
         isPrivate: false,
       })
