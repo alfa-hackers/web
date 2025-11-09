@@ -79,39 +79,6 @@
     }
   }
 
-  .connection-indicator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: rgb(255, 255, 255, 0.05);
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    &.connected {
-      color: #4ade80;
-
-      .status-dot {
-        background: #4ade80;
-      }
-    }
-
-    &.disconnected {
-      color: #ef4444;
-
-      .status-dot {
-        background: #ef4444;
-      }
-    }
-  }
-
   .chat-history {
     flex: 1;
     overflow-y: auto;
@@ -355,9 +322,10 @@
     padding: 20px;
     background: transparent;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     transition: all 0.3s ease;
-
+    
     &.centered {
       position: absolute;
       top: 50%;
@@ -366,6 +334,30 @@
       width: 100%;
       max-width: 700px;
       padding: 0 20px;
+    }
+
+    .status-panel {
+      width: 100%;
+      height: 5px;
+      max-width: 750px;
+      display: flex;
+      gap: 12px;
+      transition: all 0.2s;
+      animation: pulse 2s ease-in-out infinite;
+
+      &.centered {
+        max-width: 650px;
+      }
+
+      &.connected {
+        color: #4ade80;
+        background: #4ade80;
+      }
+
+      &.disconnected {
+        color: #ef4444;
+        background: #ef4444;
+      }
     }
 
     .input-wrapper {
@@ -478,12 +470,10 @@
   0%,
   100% {
     opacity: 1;
-    transform: scale(1);
   }
 
   50% {
     opacity: 0.5;
-    transform: scale(0.95);
   }
 }
 
@@ -615,16 +605,6 @@
       padding: 10px 12px;
     }
 
-    .connection-indicator {
-      font-size: 11px;
-      padding: 6px 10px;
-
-      .status-dot {
-        width: 6px;
-        height: 6px;
-      }
-    }
-
     .chat-history .chat-item {
       font-size: 13px;
       padding: 10px;
@@ -667,6 +647,16 @@
         .message-content {
           font-size: 14px;
         }
+      }
+    }
+
+    .connection-indicator {
+      font-size: 11px;
+      padding: 6px 10px;
+
+      .status-panel {
+        width: 6px;
+        height: 6px;
       }
     }
 
