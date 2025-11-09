@@ -49,6 +49,13 @@ export function registerFastifyPlugins(app) {
   })
 
   fastify.addHook('onRequest', async (req, res) => {
+    if (!req.cookies.user_temp_id) {
+      const tempId = crypto.randomUUID()
+      res.setCookie('user_temp_id', tempId, {
+        path: '/',
+      })
+    }
+
     if (req.session) {
       req.session.touch?.()
       await req.session.save?.()
