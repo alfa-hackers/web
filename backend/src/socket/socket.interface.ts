@@ -1,10 +1,13 @@
 export interface SendMessagePayload {
   roomId: string
   message: string
+  messageId?: string
+  chatId?: string
 }
 
 export interface JoinRoomPayload {
   roomId: string
+  roomName?: string
 }
 
 export interface ConnectionInfo {
@@ -15,6 +18,7 @@ export interface ConnectionInfo {
 export interface MessageEvent {
   userId: string
   message: string
+  chatId?: string
 }
 
 export interface JoinRoomResponse {

@@ -10,6 +10,7 @@ import { useWebSocket } from '../../store/features/chat/useWebSocket'
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import '../../styles/landing/landing.scss'
+import { loadChats } from '../../store/features/chat/loadChats'
 
 const getCookie = (name: string): string | null => {
   const matches = document.cookie.match(
@@ -19,7 +20,12 @@ const getCookie = (name: string): string | null => {
   )
   return matches ? decodeURIComponent(matches[1]) : null
 }
-import { loadChats } from '../../store/features/chat/loadChats'
+
+const getApiUrl = (): string => {
+  return process.env.NODE_ENV === 'production'
+    ? 'https://api.whirav.ru'
+    : 'http://localhost:3000'
+}
 
 const ChatLanding: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -32,15 +38,12 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        const response = await fetch('https://api.whirav.ru/health', {
+        const response = await fetch(`${getApiUrl()}/health`, {
           method: 'GET',
           credentials: 'include',
           mode: 'cors',
         })
         if (response.ok) {
-          const data = await response.json()
-          console.log('Health check успешен', data)
-
           const userId = getCookie('user_temp_id')
           if (userId) {
             dispatch(loadChats(userId))
@@ -68,7 +71,6 @@ const ChatLanding: React.FC = () => {
   const handleSendMessage = () => {
     const currentChat = chats.find((chat) => chat.id === activeChat)
     const isWaitingForResponse = currentChat?.isWaitingForResponse || false
-
     if (!inputValue.trim() || !isConnected || isWaitingForResponse) return
     sendMessage(inputValue)
     setInputValue('')

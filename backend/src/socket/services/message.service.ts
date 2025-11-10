@@ -51,12 +51,7 @@ export class MessageService {
         messageType: 'assistant',
       })
 
-      return {
-        success: true,
-        aiResponse: aiResponse.content,
-        model: aiResponse.model,
-        usage: aiResponse.usage,
-      }
+      return { success: true }
     } catch (error) {
       server
         .to(roomId)

@@ -46,7 +46,7 @@ export class RoomService {
     clientManager: ClientManagerService,
     server: Server,
   ) {
-    const { roomId } = payload
+    const { roomId, roomName } = payload
     const userId = await clientManager.getUserBySocketId(socket.id)
     const dbUserId = socket.data.dbUserId
     if (!userId) return { success: false, error: 'User not identified' }
@@ -55,7 +55,7 @@ export class RoomService {
     if (!room) {
       room = this.roomRepository.create({
         id: roomId,
-        name: roomId.toString(),
+        name: roomName || roomId.toString(),
         ownerId: dbUserId,
         isPrivate: false,
       })

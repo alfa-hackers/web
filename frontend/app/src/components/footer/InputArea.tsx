@@ -31,8 +31,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         className={`status-panel 
           ${isConnected ? 'connected' : 'disconnected'} 
           ${!hasMessages ? 'centered' : ''}`}
-      >
-      </div>
+      ></div>
       <div className="input-wrapper">
         <textarea
           value={inputValue}
@@ -42,8 +41,8 @@ const InputArea: React.FC<InputAreaProps> = ({
             isWaitingForResponse
               ? 'Ожидание ответа...'
               : isConnected
-              ? 'Задайте вопрос...'
-              : 'Ожидание подключения...'
+                ? 'Задайте вопрос...'
+                : 'Ожидание подключения...'
           }
           rows={1}
           disabled={!isConnected || isWaitingForResponse}

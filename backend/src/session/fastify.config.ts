@@ -7,7 +7,12 @@ import { join } from 'path'
 import { fastifyMultipart } from '@fastify/multipart'
 import { cookieConfig, multipartLimits } from './constants'
 
-const allowedOrigins = ['https://dev.whirav.ru', 'https://whirav.ru', 'http://localhost:3000']
+const allowedOrigins = [
+  'https://dev.whirav.ru',
+  'https://whirav.ru',
+  'http://localhost:3000',
+  'http://localhost:3001',
+]
 
 export function registerFastifyPlugins(app) {
   const fastify = app.getHttpAdapter().getInstance()
@@ -55,17 +60,11 @@ export function registerFastifyPlugins(app) {
 
       res.setCookie('user_temp_id', tempId, {
         path: '/',
-        domain: '.whirav.ru',
-        httpOnly: false,
-        secure: true,
+        httpOnly: true,
+        secure: false,
         sameSite: 'none',
         maxAge: 365 * 24 * 60 * 60,
       })
-    }
-
-    if (req.session) {
-      req.session.touch?.()
-      await req.session.save?.()
     }
   })
 }

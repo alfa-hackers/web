@@ -47,19 +47,11 @@ export const useWebSocket = () => {
         const messageId = `msg_${Date.now()}`
         const roomId = uuidv4()
 
-        dispatch(createChat({ content }))
+        dispatch(createChat({ content, roomId }))
 
         setTimeout(() => {
-          socketApi.joinRoom(roomId)
-          setTimeout(() => {
-            socketApi.sendMessage(
-              roomId,
-              content,
-              messageId,
-              Date.now().toString()
-            )
-          }, 100)
-        }, 50)
+          socketApi.sendMessage(roomId, content, messageId, roomId)
+        }, 150)
       } else {
         const messageId = `msg_${Date.now()}`
         dispatch(addMessage({ chatId: activeChat.id, content }))

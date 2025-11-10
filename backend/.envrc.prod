@@ -1,5 +1,5 @@
 export DATABASE_TYPE="postgres"
-export DATABASE_HOST="postgres"
+export DATABASE_HOST="localhost"
 export DATABASE_PORT="6432"
 export DATABASE_USERNAME="postgres"
 export DATABASE_NAME="pure"
@@ -13,7 +13,7 @@ export SESSION_SECRET="qweqwewqewqeqweqewwqeqewqweqweqweqweqweqweqweqweqweqweqwe
 
 export REDIS_PORT="6379"
 export SESSION_FOLDER="user-session"
-export REDIS_URI="redis://redis:6379"
+export REDIS_URI="redis://localhost:6379"
 
 export IMAGE_TAG="main"
 export PG_IMAGE="bitnami/postgresql"

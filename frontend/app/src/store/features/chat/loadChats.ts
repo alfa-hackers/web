@@ -1,9 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
+const getApiUrl = (): string => {
+  return process.env.NODE_ENV === 'production'
+    ? 'https://api.whirav.ru'
+    : 'http://localhost:3000'
+}
+
 export const loadChats = createAsyncThunk(
   'chat/loadChats',
   async (userId: string) => {
-    const roomsResponse = await fetch('https://api.whirav.ru/messages/rooms', {
+    const apiUrl = getApiUrl()
+
+    const roomsResponse = await fetch(`${apiUrl}/messages/rooms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,16 +29,13 @@ export const loadChats = createAsyncThunk(
     const chatsWithMessages = await Promise.all(
       rooms.map(async (room: any) => {
         try {
-          const messagesResponse = await fetch(
-            'https://api.whirav.ru/messages/history',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ roomId: room.id }),
-            }
-          )
+          const messagesResponse = await fetch(`${apiUrl}/messages/history`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ roomId: room.id }),
+          })
 
           if (!messagesResponse.ok) {
             return {
