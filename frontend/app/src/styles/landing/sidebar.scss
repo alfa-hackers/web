@@ -1,0 +1,158 @@
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.sidebar {
+  width: 260px;
+  background: $color-sidebar-bg;
+  border-right: 1px solid $color-dark;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  transition: transform 0.3s ease;
+
+  .sidebar-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text;
+    font-size: 14px;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    .plus-icon {
+      font-size: 20px;
+      font-weight: 300;
+    }
+
+    &:hover {
+      background: $color-dark;
+      border-color: $color-border-light;
+      color: $color-white;
+    }
+  }
+
+  .chat-history {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $color-border;
+      border-radius: 3px;
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: $radius-md;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+      position: relative;
+
+      .chat-icon {
+        font-size: 16px;
+      }
+
+      .chat-title {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $color-text;
+      }
+
+      .delete-chat-btn {
+        position: absolute;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border: none;
+        background: $color-alfa-light;
+        color: $color-alfa;
+        border-radius: $radius-sm;
+        cursor: pointer;
+        font-size: 20px;
+        line-height: 1;
+        opacity: 0;
+        transition: $transition-fast;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: $color-alfa-hover;
+        }
+      }
+
+      &:hover {
+        background: $color-dark;
+
+        .chat-title {
+          color: $color-white;
+        }
+
+        .delete-chat-btn {
+          opacity: 1;
+        }
+      }
+
+      &.active {
+        background: transparent;
+        border: 1px solid $color-alfa;
+
+        &:hover {
+          background: $color-dark;
+
+          .chat-title {
+            color: $color-white;
+          }
+        }
+
+        .delete-chat-btn {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-10px); opacity: 1; }
+}

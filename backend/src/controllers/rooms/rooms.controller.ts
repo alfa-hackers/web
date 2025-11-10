@@ -7,7 +7,7 @@ import { ApiBody } from '@nestjs/swagger'
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @Post('/')
+  @Post('/by-user')
   @ApiBody({
     description: 'Запрос комнат пользователя',
     type: GetUserRoomsDto,

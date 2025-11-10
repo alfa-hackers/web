@@ -1,0 +1,253 @@
+.viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: $transition-medium;
+
+  &.has-messages {
+    .welcome {
+      display: none;
+    }
+
+    .input-area {
+      position: relative;
+      transform: none;
+    }
+  }
+
+  .welcome {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 20px;
+
+    h1 {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      background: $color-text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      font-size: 18px;
+      color: $color-text;
+      margin-bottom: 24px;
+    }
+
+    .connection-warning {
+      margin-top: 24px;
+      padding: 12px 24px;
+      background: $color-alfa-light;
+      border: 1px solid $color-alfa-border;
+      border-radius: $radius-md;
+      color: $color-alfa;
+      font-size: 14px;
+    }
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $color-border;
+      border-radius: 4px;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      animation: fadeIn 0.3s;
+      width: 100%;
+      background: $color-message-bg;
+      padding: 20px;
+      border-radius: $radius-lg;
+
+      &.user,
+      &.assistant {
+        flex-direction: row;
+
+        .message-bubble {
+          background: transparent;
+          color: $color-white;
+          padding: 0;
+        }
+      }
+
+      &.typing .message-bubble {
+        padding: 16px 0;
+      }
+
+      .message-avatar {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+        padding-top: 4px;
+      }
+
+      .message-bubble {
+        flex: 1;
+        overflow-wrap: break-word;
+      }
+
+      .message-content {
+        font-size: 16px;
+        line-height: 1.6;
+        color: $color-text;
+      }
+
+      .message-status {
+        margin-top: 8px;
+        font-size: 11px;
+        opacity: 0.7;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .status-sending,
+        .status-sent,
+        .status-error {
+          color: $color-text-muted;
+        }
+      }
+    }
+  }
+
+  .input-area {
+    padding: 20px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: $transition-medium;
+    
+    &.centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 700px;
+      padding: 0 20px;
+    }
+
+    .status-panel {
+      width: 100%;
+      height: 5px;
+      max-width: 750px;
+      display: flex;
+      gap: 12px;
+      transition: $transition-fast;
+      animation: pulse 2s ease-in-out infinite;
+
+      &.centered {
+        max-width: 650px;
+      }
+
+      &.connected {
+        color: $color-alfa;
+        background: $color-alfa;
+      }
+
+      &.disconnected {
+        color: $color-sidebar-bg;
+        background: $color-sidebar-bg;
+      }
+    }
+
+    .input-wrapper {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      gap: 12px;
+      background: $color-white;
+      border-radius: $radius-xl;
+      padding: 4px;
+      border: 1px solid $color-border;
+      transition: $transition-fast;
+
+      &:focus-within {
+        border-color: $color-border-light;
+        box-shadow: 0 0 0 3px rgba(43, 92, 230, 0.1);
+      }
+    }
+
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 14px 16px;
+      color: $color-text;
+      font-size: 16px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      max-height: 200px;
+      min-height: 52px;
+
+      &::placeholder {
+        color: $color-text-light;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    button {
+      width: 44px;
+      height: 44px;
+      background: $color-text-muted;
+      border: none;
+      border-radius: $radius-lg;
+      color: $color-sidebar-bg;
+      font-size: 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: $transition-fast;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      align-self: flex-end;
+      margin: 4px;
+
+      &:hover:not(:disabled) {
+        background: $color-alfa;
+        transform: scale(1.05);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: $color-text-light;
+      }
+    }
+  }
+}
