@@ -60,8 +60,8 @@ export function registerFastifyPlugins(app) {
 
       res.setCookie('user_temp_id', tempId, {
         path: '/',
-        httpOnly: true,
-        secure: false,
+        httpOnly: false,
+        secure: true,
         sameSite: 'none',
         maxAge: 365 * 24 * 60 * 60,
       })

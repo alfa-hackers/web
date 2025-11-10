@@ -6,6 +6,21 @@ const getApiUrl = (): string => {
     : 'http://localhost:3000'
 }
 
+interface ApiMessage {
+  id: string
+  text: string
+  messageType: 'user' | 'assistant'
+  isAi: boolean
+  roomId: string
+  createdAt: string
+}
+
+interface ApiRoom {
+  id: string
+  name: string
+  description: string | null
+}
+
 export const loadChats = createAsyncThunk(
   'chat/loadChats',
   async (userId: string) => {
@@ -24,12 +39,12 @@ export const loadChats = createAsyncThunk(
     }
 
     const roomsResult = await roomsResponse.json()
-    const rooms = roomsResult.data
+    const rooms: ApiRoom[] = roomsResult.data
 
     const chatsWithMessages = await Promise.all(
-      rooms.map(async (room: any) => {
+      rooms.map(async (room) => {
         try {
-          const messagesResponse = await fetch(`${apiUrl}/messages/history`, {
+          const messagesResponse = await fetch(`${apiUrl}/messages/messages`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -38,9 +53,10 @@ export const loadChats = createAsyncThunk(
           })
 
           if (!messagesResponse.ok) {
+            console.error(`Failed to load messages for room ${room.id}`)
             return {
               id: room.id,
-              title: room.name || 'Чат',
+              title: room.name || 'Новый чат',
               roomId: room.id,
               messages: [],
               isWaitingForResponse: false,
@@ -48,24 +64,33 @@ export const loadChats = createAsyncThunk(
           }
 
           const messagesResult = await messagesResponse.json()
-          const messages = messagesResult.data || []
+          const messages: ApiMessage[] = messagesResult.data || []
+
+          const sortedMessages = messages.sort(
+            (a, b) =>
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          )
 
           return {
             id: room.id,
-            title: room.name || 'Чат',
+            title: room.name || 'Новый чат',
             roomId: room.id,
-            messages: messages.map((msg: any) => ({
+            messages: sortedMessages.map((msg) => ({
               id: msg.id,
-              content: msg.content,
-              sender: msg.sender,
-              status: 'sent',
+              content: msg.text,
+              sender:
+                msg.messageType === 'user'
+                  ? ('user' as const)
+                  : ('assistant' as const),
+              status: 'sent' as const,
             })),
             isWaitingForResponse: false,
           }
         } catch (error) {
+          console.error(`Error loading messages for room ${room.id}:`, error)
           return {
             id: room.id,
-            title: room.name || 'Чат',
+            title: room.name || 'Новый чат',
             roomId: room.id,
             messages: [],
             isWaitingForResponse: false,
@@ -75,5 +100,45 @@ export const loadChats = createAsyncThunk(
     )
 
     return chatsWithMessages
+  }
+)
+
+export const loadRoomMessages = createAsyncThunk(
+  'chat/loadRoomMessages',
+  async (roomId: string) => {
+    const apiUrl = getApiUrl()
+
+    const messagesResponse = await fetch(`${apiUrl}/messages/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ roomId }),
+    })
+
+    if (!messagesResponse.ok) {
+      throw new Error('Failed to load room messages')
+    }
+
+    const messagesResult = await messagesResponse.json()
+    const messages: ApiMessage[] = messagesResult.data || []
+
+    const sortedMessages = messages.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+
+    return {
+      roomId,
+      messages: sortedMessages.map((msg) => ({
+        id: msg.id,
+        content: msg.text,
+        sender:
+          msg.messageType === 'user'
+            ? ('user' as const)
+            : ('assistant' as const),
+        status: 'sent' as const,
+      })),
+    }
   }
 )

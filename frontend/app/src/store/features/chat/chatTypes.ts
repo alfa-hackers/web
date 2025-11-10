@@ -17,4 +17,6 @@ export interface ChatState {
   chats: Chat[]
   activeChat: string | null
   isCreatingNew: boolean
+  isLoading?: boolean
+  error?: string | null
 }

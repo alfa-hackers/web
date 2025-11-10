@@ -9,6 +9,7 @@ import {
 class SocketApi {
   private socket: Socket | null = null
   private dispatch: AppDispatch | null = null
+  private joinedRooms: Set<string> = new Set()
 
   initialize(dispatch: AppDispatch) {
     if (this.socket?.connected) return
@@ -75,14 +76,16 @@ class SocketApi {
   }
 
   joinRoom(roomId: string, roomName?: string) {
-    if (this.socket?.connected) {
+    if (this.socket?.connected && !this.joinedRooms.has(roomId)) {
       this.socket.emit('joinRoom', { roomId, roomName })
+      this.joinedRooms.add(roomId)
     }
   }
 
   leaveRoom(roomId: string) {
-    if (this.socket?.connected) {
+    if (this.socket?.connected && this.joinedRooms.has(roomId)) {
       this.socket.emit('leaveRoom', { roomId })
+      this.joinedRooms.delete(roomId)
     }
   }
 
@@ -123,6 +126,7 @@ class SocketApi {
     if (this.socket) {
       this.socket.disconnect()
       this.socket = null
+      this.joinedRooms.clear()
     }
   }
 

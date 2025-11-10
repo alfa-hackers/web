@@ -33,11 +33,12 @@ export const useWebSocket = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (activeChatRoomId && isConnected && !isInitializing) {
-      socketApi.joinRoom(activeChatRoomId)
+    if (activeChatRoomId && isConnected && !isInitializing && activeChat) {
+      const roomName = activeChat.messages[0]?.content || activeChat.title
+      socketApi.joinRoom(activeChatRoomId, roomName)
       return () => socketApi.leaveRoom(activeChatRoomId)
     }
-  }, [activeChatRoomId, isConnected, isInitializing])
+  }, [activeChatRoomId, isConnected, isInitializing, activeChat])
 
   const sendMessage = useCallback(
     (content: string) => {
@@ -50,6 +51,7 @@ export const useWebSocket = () => {
         dispatch(createChat({ content, roomId }))
 
         setTimeout(() => {
+          socketApi.joinRoom(roomId, content)
           socketApi.sendMessage(roomId, content, messageId, roomId)
         }, 150)
       } else {
