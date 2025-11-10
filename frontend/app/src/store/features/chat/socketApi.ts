@@ -22,6 +22,10 @@ class SocketApi {
       secure: !isDev,
     })
 
+    this.socket.on('connect', () => {
+      console.log('Socket connected')
+    })
+
     this.socket.on('message', (data: { userId: string; message: string; chatId?: string }) => {
       if (data.userId === 'assistant' && this.dispatch) {
         this.dispatch(addAssistantMessage({ content: data.message }))
@@ -32,6 +36,7 @@ class SocketApi {
     })
 
     this.socket.on('message_sent', (data: { messageId: string; success: boolean }) => {
+      console.log('message_sent received:', data)
       if (this.dispatch) {
         this.dispatch(
           updateMessageStatus({
@@ -43,6 +48,7 @@ class SocketApi {
     })
 
     this.socket.on('message_error', (data: { messageId: string; error: string; chatId?: string }) => {
+      console.log('message_error received:', data)
       if (this.dispatch) {
         this.dispatch(
           updateMessageStatus({
@@ -80,6 +86,7 @@ class SocketApi {
     }
 
     this.socket.emit('sendMessage', { roomId, message, messageId, chatId }, (response: any) => {
+      console.log('sendMessage callback:', response)
       if (this.dispatch) {
         this.dispatch(
           updateMessageStatus({
@@ -93,12 +100,6 @@ class SocketApi {
         }
       }
     })
-
-    setTimeout(() => {
-      if (this.dispatch) {
-        this.dispatch(updateMessageStatus({ messageId, status: 'sent' }))
-      }
-    }, 5000)
   }
 
   disconnect() {

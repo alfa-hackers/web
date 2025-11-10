@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ChatState, Chat } from './chatTypes'
 import { loadChats } from './loadChats'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,7 +15,7 @@ const chatSlice = createSlice({
   reducers: {
     createChat: (state, action: PayloadAction<{ content: string }>) => {
       const roomId = uuidv4()
-      const messageId = uuidv4()
+      const messageId = `msg_${Date.now()}`
       const newChat: Chat = {
         id: roomId.toString(),
         title: action.payload.content.slice(0, 30) || 'Новый чат',
@@ -42,8 +42,9 @@ const chatSlice = createSlice({
       const chat = state.chats.find((c) => c.id === action.payload.chatId)
       if (chat) {
         chat.isWaitingForResponse = true
+        const messageId = `msg_${Date.now()}`
         chat.messages.push({
-          id: `msg_${Date.now()}`,
+          id: messageId,
           content: action.payload.content,
           sender: 'user',
           status: 'sending',
@@ -76,11 +77,13 @@ const chatSlice = createSlice({
         status: 'sending' | 'sent' | 'error'
       }>
     ) => {
+      console.log('updateMessageStatus called:', action.payload)
       for (const chat of state.chats) {
         const message = chat.messages.find(
           (m) => m.id === action.payload.messageId
         )
         if (message) {
+          console.log('Found message, updating status:', message.id, action.payload.status)
           message.status = action.payload.status
           break
         }

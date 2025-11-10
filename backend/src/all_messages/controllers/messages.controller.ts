@@ -26,7 +26,7 @@ export class MessagesController {
     return this.messagesService.getMessagesByUserId(body)
   }
 
-  @Post('by-room')
+  @Post('messages')
   @ApiBody({
     description: 'Получение всех сообщений конкретной комнаты',
     type: GetRoomMessagesDto,
