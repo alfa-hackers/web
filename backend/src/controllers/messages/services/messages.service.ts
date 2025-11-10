@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { User } from 'domain/user.entity'
-import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from 'controllers/messages/dto/messages.dto'
+import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
 
 @Injectable()
 export class MessagesService {
@@ -44,7 +44,7 @@ export class MessagesService {
     }
   }
 
-  async getMessagesByUserId(query: GetMessagesQueryDto) {
+  async getMessagesByUserId(query: GetUserMessagesDto) {
     const { userId } = query
 
     const userExists = await this.userRepository.findOne({ where: { id: userId } })
@@ -66,30 +66,6 @@ export class MessagesService {
     }
   }
 
-  async getRoomsByUserId(query: GetUserRoomsQueryDto) {
-    const { userId } = query
-
-    const userExists = await this.userRepository.findOne({ where: { id: userId } })
-    if (!userExists) {
-      throw new NotFoundException(`User with ID ${userId} not found`)
-    }
-
-    const rooms = await this.roomRepository
-      .createQueryBuilder('room')
-      .leftJoinAndSelect('room.owner', 'owner')
-      .leftJoin('room.userRooms', 'userRoom')
-      .where('userRoom.userId = :userId', { userId })
-      .orderBy('room.createdAt', 'DESC')
-      .getMany()
-
-    return {
-      data: rooms,
-      meta: {
-        total: rooms.length,
-      },
-    }
-  }
-
   async getMessageById(messageId: string) {
     const message = await this.messageRepository.findOne({
       where: { id: messageId },
@@ -101,19 +77,5 @@ export class MessagesService {
     }
 
     return message
-  }
-  async deleteRoom(roomId: string) {
-    const room = await this.roomRepository.findOne({
-      where: { id: roomId },
-      relations: ['owner'],
-    })
-
-    if (!room) {
-      throw new NotFoundException(`Room with ID ${roomId} not found`)
-    }
-
-    await this.roomRepository.remove(room)
-
-    return { success: true, message: 'Room deleted successfully' }
   }
 }

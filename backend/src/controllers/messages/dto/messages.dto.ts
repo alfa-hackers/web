@@ -1,34 +1,23 @@
 import {
-  getMessagesQuerySchema,
-  getUserRoomsQuerySchema,
-  GetMessagesQueryType,
-  GetUserRoomsQueryType,
-  GetRoomMessagesType,
+  getUserMessagesSchema,
+  GetUserMessagesType,
   getRoomMessagesSchema,
+  GetRoomMessagesType,
 } from 'controllers/messages/dto/messages.schema'
 
-export class GetMessagesQueryDto implements GetMessagesQueryType {
-  static schema = getMessagesQuerySchema
+export class GetUserMessagesDto implements GetUserMessagesType {
+  static schema = getUserMessagesSchema
 
   userId: string
   roomId?: string
   limit?: number
   offset?: number
 
-  constructor(data: GetMessagesQueryType) {
-    Object.assign(this, GetMessagesQueryDto.schema.parse(data))
+  constructor(data: GetUserMessagesType) {
+    Object.assign(this, GetUserMessagesDto.schema.parse(data))
   }
 }
 
-export class GetUserRoomsQueryDto implements GetUserRoomsQueryType {
-  static schema = getUserRoomsQuerySchema
-
-  userId: string
-
-  constructor(data: GetUserRoomsQueryType) {
-    Object.assign(this, GetUserRoomsQueryDto.schema.parse(data))
-  }
-}
 export class GetRoomMessagesDto implements GetRoomMessagesType {
   static schema = getRoomMessagesSchema
 

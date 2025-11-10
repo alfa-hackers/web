@@ -5,6 +5,7 @@ import { HealthModule } from 'health/health.module'
 import { DatabaseModule } from 'adapters/database.module'
 import { SocketModule } from 'socket/socket.module'
 import { MessagesModule } from 'controllers/messages/messages.module'
+import { RoomsModule } from 'controllers/rooms/rooms.module'
 
 @Module({
   controllers: [],
@@ -20,7 +21,8 @@ import { MessagesModule } from 'controllers/messages/messages.module'
     HealthModule,
     DatabaseModule,
     SocketModule,
-    MessagesModule
+    MessagesModule,
+    RoomsModule
   ],
 })
 export class AppModule {}
