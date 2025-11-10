@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatState, Chat } from './chatTypes'
+import { loadChats } from './loadChats'
 
 const initialState: ChatState = {
   chats: [],
@@ -110,6 +111,11 @@ const chatSlice = createSlice({
       if (state.activeChat === action.payload) state.activeChat = null
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(loadChats.fulfilled, (state, action) => {
+      state.chats = action.payload
+    })
+  },
 })
 
 export const {
@@ -122,4 +128,5 @@ export const {
   setCreatingNew,
   deleteChat,
 } = chatSlice.actions
+
 export default chatSlice.reducer

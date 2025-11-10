@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../../store/store'
+import { RootState, AppDispatch } from '../../store/store'
 import {
   setActiveChat,
   setCreatingNew,
@@ -11,8 +11,18 @@ import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import '../../styles/landing/landing.scss'
 
+const getCookie = (name: string): string | null => {
+  const matches = document.cookie.match(
+    new RegExp(
+      '(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'
+    )
+  )
+  return matches ? decodeURIComponent(matches[1]) : null
+}
+import { loadChats } from '../../store/features/chat/loadChats'
+
 const ChatLanding: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const { chats, activeChat } = useSelector((state: RootState) => state.chat)
   const [inputValue, setInputValue] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -20,7 +30,7 @@ const ChatLanding: React.FC = () => {
   const { sendMessage, isConnected } = useWebSocket()
 
   useEffect(() => {
-    const checkHealth = async () => {
+    const initializeApp = async () => {
       try {
         const response = await fetch('https://api.whirav.ru/health', {
           method: 'GET',
@@ -30,13 +40,20 @@ const ChatLanding: React.FC = () => {
         if (response.ok) {
           const data = await response.json()
           console.log('Health check успешен', data)
+
+          const userId = getCookie('user_temp_id')
+          if (userId) {
+            dispatch(loadChats(userId))
+          } else {
+            console.error('user_temp_id не найден в cookies')
+          }
         }
       } catch (error) {
         console.error('Ошибка health check:', error)
       }
     }
-    checkHealth()
-  }, [])
+    initializeApp()
+  }, [dispatch])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

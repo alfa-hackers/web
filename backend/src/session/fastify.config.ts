@@ -52,8 +52,14 @@ export function registerFastifyPlugins(app) {
   fastify.addHook('onRequest', async (req, res) => {
     if (!req.cookies.user_temp_id) {
       const tempId = crypto.randomUUID()
+
       res.setCookie('user_temp_id', tempId, {
         path: '/',
+        domain: '.whirav.ru',
+        httpOnly: false,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 365 * 24 * 60 * 60,
       })
     }
 
