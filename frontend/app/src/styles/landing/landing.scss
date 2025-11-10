@@ -13,6 +13,65 @@
   position: relative;
 }
 
+.header-actions {
+  display: flex;
+  padding: 12px;
+  justify-content: flex-end;
+  gap: 10px;
+  position: absolute; /* Positions this container absolutely */
+  top: 12px; /* Distance from the top */
+  right: 12px;
+}
+
+.header-actions.reversed {
+  justify-content: flex-start; /* Aligns buttons to the left if the class 'reversed' is added */
+}
+
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  background: $color-accent;
+  border: none;
+  border-radius: $radius-md;
+  color: $color-white;
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: $color-accent-hover;
+  }
+}
+
+.upload-btn {
+  color: $color-border;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 10px;
+  display: inline-block;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $color-accent;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+}
+
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 .typing-indicator {
   display: flex;
   gap: 4px;

@@ -195,6 +195,11 @@
         border-color: $color-border-light;
         box-shadow: 0 0 0 3px rgba(43, 92, 230, 0.1);
       }
+
+      &.dragging {
+        border-color: $color-accent;
+        background-color: rgba(8, 98, 140, 0.1);
+      }
     }
 
     textarea {
