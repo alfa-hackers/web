@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
-import { MessagesService } from '../services/messages.service'
-import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { MessagesService } from 'controllers/messages/services/messages.service'
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from 'controllers/messages/dto/messages.dto'
 import { ApiBody } from '@nestjs/swagger'
 
 @Controller('messages')

@@ -1,1 +1,1 @@
-export * from './fastify.config'
+export * from 'session/fastify.config'

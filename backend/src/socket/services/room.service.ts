@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { User } from 'src/domain/user.entity'
-import { ClientManagerService } from '../client-manager.service'
-import { JoinRoomPayload } from '../socket.interface'
-import { Room } from 'src/domain/room.entity'
-import { UserRoom } from 'src/domain/user-room.entity'
+import { User } from 'domain/user.entity'
+import { Room } from 'domain/room.entity'
+import { UserRoom } from 'domain/user-room.entity'
+import { ClientManagerService } from 'socket/client-manager.service'
+import { JoinRoomPayload } from 'socket/socket.interface'
 
 @Injectable()
 export class RoomService {

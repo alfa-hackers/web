@@ -8,9 +8,9 @@ import {
   JoinColumn,
   PrimaryColumn,
 } from 'typeorm'
-import { User } from './user.entity'
-import { UserRoom } from './user-room.entity'
-import { Message } from './message.entity'
+import { User } from 'domain/user.entity'
+import { UserRoom } from 'domain/user-room.entity'
+import { Message } from 'domain/message.entity'
 
 @Entity('rooms')
 export class Room {

@@ -10,12 +10,12 @@ import {
 import { Server, Socket } from 'socket.io'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { ClientManagerService } from './client-manager.service'
-import { AIService } from './ai.service'
-import { User } from 'src/domain/user.entity'
-import { JoinRoomPayload, SendMessagePayload } from './socket.interface'
-import { RoomService } from './services/room.service'
-import { MessageService } from './services/message.service'
+import { ClientManagerService } from 'socket/client-manager.service'
+import { AIService } from 'socket/ai.service'
+import { User } from 'domain/user.entity'
+import { JoinRoomPayload, SendMessagePayload } from 'socket/socket.interface'
+import { RoomService } from 'socket/services/room.service'
+import { MessageService } from 'socket/services/message.service'
 
 @WebSocketGateway({
   cors: { origin: '*', credentials: true },

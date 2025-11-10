@@ -5,7 +5,7 @@ import {
   GetUserRoomsQueryType,
   GetRoomMessagesType,
   getRoomMessagesSchema,
-} from './messages.schema'
+} from 'controllers/messages/dto/messages.schema'
 
 export class GetMessagesQueryDto implements GetMessagesQueryType {
   static schema = getMessagesQuerySchema

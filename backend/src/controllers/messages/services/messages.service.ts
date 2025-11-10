@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Message } from 'src/domain/message.entity'
-import { Room } from 'src/domain/room.entity'
-import { User } from 'src/domain/user.entity'
-import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { Message } from 'domain/message.entity'
+import { Room } from 'domain/room.entity'
+import { User } from 'domain/user.entity'
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from 'controllers/messages/dto/messages.dto'
 
 @Injectable()
 export class MessagesService {

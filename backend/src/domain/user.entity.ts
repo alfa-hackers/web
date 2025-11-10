@@ -6,9 +6,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm'
-import { Room } from './room.entity'
-import { UserRoom } from './user-room.entity'
-import { Message } from './message.entity'
+import { Room } from 'domain/room.entity'
+import { UserRoom } from 'domain/user-room.entity'
+import { Message } from 'domain/message.entity'
 
 @Entity('users')
 export class User {

@@ -1,1 +1,1 @@
-export * from './bigint-serializer.interceptor'
+export * from 'common/interceptors/bigint-serializer.interceptor'

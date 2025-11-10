@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { loginSchema } from './login.schema'
+import { loginSchema } from 'controllers/auth/dto/login.schema'
 
 export class LoginDto {
   static schema = loginSchema
