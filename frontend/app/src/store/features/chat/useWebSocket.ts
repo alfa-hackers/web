@@ -32,38 +32,40 @@ export const useWebSocket = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (activeChatRoomId && isConnected) {
+    if (activeChatRoomId && isConnected && !isInitializing) {
       socketApi.joinRoom(activeChatRoomId)
       return () => socketApi.leaveRoom(activeChatRoomId)
     }
-  }, [activeChatRoomId, isConnected])
+  }, [activeChatRoomId, isConnected, isInitializing])
 
   const sendMessage = useCallback(
     (content: string) => {
-      if (!content.trim()) return
+      if (!content.trim() || isInitializing) return
 
       if (!activeChat) {
-        dispatch(createChat({ content }))
-        setTimeout(() => {
-          const state = (window as any).__REDUX_STORE__?.getState()
-          const newActiveChat = state?.chat?.chats[0]
-          if (newActiveChat) {
-            const messageId = newActiveChat.messages[0]?.id
-            socketApi.sendMessage(newActiveChat.roomId, content, messageId, newActiveChat.id)
-          }
-        }, 0)
-      } else {
-        dispatch(addMessage({ chatId: activeChat.id, content }))
         const messageId = `msg_${Date.now()}`
+        const roomId = `room_${Date.now()}`
+        
+        dispatch(createChat({ content }))
+        
+        setTimeout(() => {
+          socketApi.joinRoom(roomId)
+          setTimeout(() => {
+            socketApi.sendMessage(roomId, content, messageId, Date.now().toString())
+          }, 100)
+        }, 50)
+      } else {
+        const messageId = `msg_${Date.now()}`
+        dispatch(addMessage({ chatId: activeChat.id, content }))
         socketApi.sendMessage(activeChat.roomId, content, messageId, activeChat.id)
       }
     },
-    [activeChat, dispatch]
+    [activeChat, dispatch, isInitializing]
   )
 
   return {
     sendMessage,
-    isConnected: isInitializing ? true : isConnected,
+    isConnected: isInitializing ? false : isConnected,
     isInitializing,
   }
 }
