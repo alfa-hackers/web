@@ -22,47 +22,90 @@ class SocketApi {
       secure: !isDev,
     })
 
-    this.socket.on('message', (data: { userId: string; message: string }) => {
+    this.socket.on('message', (data: { userId: string; message: string; chatId?: string }) => {
       if (data.userId === 'assistant' && this.dispatch) {
         this.dispatch(addAssistantMessage({ content: data.message }))
+        if (data.chatId) {
+          this.dispatch(setWaitingForResponse({ chatId: data.chatId, isWaiting: false }))
+        }
       }
     })
-  }
 
-  joinRoom(roomId: string) {
-    this.socket?.emit('joinRoom', { roomId })
-  }
-
-  leaveRoom(roomId: string) {
-    this.socket?.emit('leaveRoom', { roomId })
-  }
-
-  sendMessage(roomId: string, message: string, messageId: string, chatId: string) {
-    if (!this.socket?.connected && this.dispatch) {
-      this.dispatch(updateMessageStatus({ messageId, status: 'error' }))
-      this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
-      return
-    }
-    
-    this.socket?.emit('sendMessage', { roomId, message }, (response: any) => {
+    this.socket.on('message_sent', (data: { messageId: string; success: boolean }) => {
       if (this.dispatch) {
         this.dispatch(
           updateMessageStatus({
-            messageId,
-            status: response.success ? 'sent' : 'error',
+            messageId: data.messageId,
+            status: data.success ? 'sent' : 'error',
           })
         )
-        
-        if (!response.success) {
-          this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
+      }
+    })
+
+    this.socket.on('message_error', (data: { messageId: string; error: string; chatId?: string }) => {
+      if (this.dispatch) {
+        this.dispatch(
+          updateMessageStatus({
+            messageId: data.messageId,
+            status: 'error',
+          })
+        )
+
+        if (data.chatId) {
+          this.dispatch(setWaitingForResponse({ chatId: data.chatId, isWaiting: false }))
         }
       }
     })
   }
 
+  joinRoom(roomId: string) {
+    if (this.socket?.connected) {
+      this.socket.emit('joinRoom', { roomId })
+    }
+  }
+
+  leaveRoom(roomId: string) {
+    if (this.socket?.connected) {
+      this.socket.emit('leaveRoom', { roomId })
+    }
+  }
+
+  sendMessage(roomId: string, message: string, messageId: string, chatId: string) {
+    if (!this.socket?.connected) {
+      if (this.dispatch) {
+        this.dispatch(updateMessageStatus({ messageId, status: 'error' }))
+        this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
+      }
+      return
+    }
+
+    this.socket.emit('sendMessage', { roomId, message, messageId, chatId }, (response: any) => {
+      if (this.dispatch) {
+        this.dispatch(
+          updateMessageStatus({
+            messageId,
+            status: response?.success ? 'sent' : 'error',
+          })
+        )
+
+        if (!response?.success) {
+          this.dispatch(setWaitingForResponse({ chatId, isWaiting: false }))
+        }
+      }
+    })
+
+    setTimeout(() => {
+      if (this.dispatch) {
+        this.dispatch(updateMessageStatus({ messageId, status: 'sent' }))
+      }
+    }, 5000)
+  }
+
   disconnect() {
-    this.socket?.disconnect()
-    this.socket = null
+    if (this.socket) {
+      this.socket.disconnect()
+      this.socket = null
+    }
   }
 
   isConnected() {

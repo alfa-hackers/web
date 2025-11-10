@@ -8,11 +8,10 @@ import {
   Param,
   HttpCode,
   HttpStatus,
-  UsePipes,
 } from '@nestjs/common'
 import { MessagesService } from '../services/messages.service'
-import { GetMessagesQueryDto, GetUserRoomsQueryDto, CreateMessageDto } from '../dto/messages.dto'
-import { ApiBody } from '@nestjs/swagger';
+import { GetMessagesQueryDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { ApiBody } from '@nestjs/swagger'
 
 @Controller('messages')
 export class MessagesController {
