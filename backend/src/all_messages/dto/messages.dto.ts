@@ -3,6 +3,8 @@ import {
   getUserRoomsQuerySchema,
   GetMessagesQueryType,
   GetUserRoomsQueryType,
+  GetRoomMessagesType,
+  getRoomMessagesSchema,
 } from './messages.schema'
 
 export class GetMessagesQueryDto implements GetMessagesQueryType {
@@ -25,5 +27,16 @@ export class GetUserRoomsQueryDto implements GetUserRoomsQueryType {
 
   constructor(data: GetUserRoomsQueryType) {
     Object.assign(this, GetUserRoomsQueryDto.schema.parse(data))
+  }
+}
+export class GetRoomMessagesDto implements GetRoomMessagesType {
+  static schema = getRoomMessagesSchema
+
+  roomId: string
+  limit?: number
+  offset?: number
+
+  constructor(data: GetRoomMessagesType) {
+    Object.assign(this, GetRoomMessagesDto.schema.parse(data))
   }
 }

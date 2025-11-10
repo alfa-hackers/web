@@ -1,16 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Query,
-  Body,
-  Param,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common'
+import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
 import { MessagesService } from '../services/messages.service'
-import { GetMessagesQueryDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
 import { ApiBody } from '@nestjs/swagger'
 
 @Controller('messages')
@@ -33,7 +23,26 @@ export class MessagesController {
     },
   })
   async getMessages(@Body() body: GetMessagesQueryDto) {
-    return this.messagesService.getMessagesByUserId(body);
+    return this.messagesService.getMessagesByUserId(body)
+  }
+
+  @Post('by-room')
+  @ApiBody({
+    description: 'Получение всех сообщений конкретной комнаты',
+    type: GetRoomMessagesDto,
+    examples: {
+      example1: {
+        summary: 'Запрос сообщений комнаты',
+        value: {
+          roomId: 'room123',
+          limit: 20,
+          offset: 0,
+        },
+      },
+    },
+  })
+  async getRoomMessages(@Body() body: GetRoomMessagesDto) {
+    return this.messagesService.getMessagesByRoomId(body)
   }
 
   @Post('rooms')
@@ -50,7 +59,7 @@ export class MessagesController {
     },
   })
   async getUserRooms(@Body() body: GetUserRoomsQueryDto) {
-    return this.messagesService.getRoomsByUserId(body);
+    return this.messagesService.getRoomsByUserId(body)
   }
 
   @Get(':id')
@@ -58,9 +67,9 @@ export class MessagesController {
     return this.messagesService.getMessageById(id)
   }
 
-  @Delete(':id')
+  @Delete('room/:id')
   @HttpCode(HttpStatus.OK)
-  async deleteMessage(@Param('id') id: string, @Query('userId') userId: string) {
-    return this.messagesService.deleteMessage(id, userId)
+  async deleteRoom(@Param('id') id: string) {
+    return this.messagesService.deleteRoom(id)
   }
 }

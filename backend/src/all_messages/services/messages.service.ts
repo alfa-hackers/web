@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { Message } from 'src/domain/message.entity'
 import { Room } from 'src/domain/room.entity'
 import { User } from 'src/domain/user.entity'
-import { GetMessagesQueryDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
 
 @Injectable()
 export class MessagesService {
@@ -17,29 +17,54 @@ export class MessagesService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  
-    async getMessagesByUserId(query: GetMessagesQueryDto) {
-        const { userId } = query
+  async getMessagesByRoomId(dto: GetRoomMessagesDto) {
+    const { roomId, limit, offset } = dto
 
+    const room = await this.roomRepository.findOne({ where: { id: roomId } })
 
-        const userExists = await this.userRepository.findOne({ where: { id: userId } })
-        if (!userExists) {
-            throw new NotFoundException(`User with ID ${userId} not found`)
-        }
-
-        const messages = await this.messageRepository.find({
-            where: { userId },
-            relations: ['room', 'user'],
-            order: { createdAt: 'DESC' },
-        })
-
-        return {
-            data: messages,
-            meta: {
-            total: messages.length,
-            },
-        }
+    if (!room) {
+      throw new NotFoundException(`Room with ID ${roomId} not found`)
     }
+
+    const messages = await this.messageRepository.find({
+      where: { roomId },
+      relations: ['room', 'user'],
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    })
+
+    return {
+      data: messages,
+      meta: {
+        total: messages.length,
+        limit,
+        offset,
+      },
+    }
+  }
+
+  async getMessagesByUserId(query: GetMessagesQueryDto) {
+    const { userId } = query
+
+    const userExists = await this.userRepository.findOne({ where: { id: userId } })
+    if (!userExists) {
+      throw new NotFoundException(`User with ID ${userId} not found`)
+    }
+
+    const messages = await this.messageRepository.find({
+      where: { userId },
+      relations: ['room', 'user'],
+      order: { createdAt: 'DESC' },
+    })
+
+    return {
+      data: messages,
+      meta: {
+        total: messages.length,
+      },
+    }
+  }
 
   async getRoomsByUserId(query: GetUserRoomsQueryDto) {
     const { userId } = query
@@ -77,22 +102,18 @@ export class MessagesService {
 
     return message
   }
-
-  async deleteMessage(messageId: string, userId: string) {
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
+  async deleteRoom(roomId: string) {
+    const room = await this.roomRepository.findOne({
+      where: { id: roomId },
+      relations: ['owner'],
     })
 
-    if (!message) {
-      throw new NotFoundException(`Message with ID ${messageId} not found`)
+    if (!room) {
+      throw new NotFoundException(`Room with ID ${roomId} not found`)
     }
 
-    if (message.userId !== userId) {
-      throw new NotFoundException(`You don't have permission to delete this message`)
-    }
+    await this.roomRepository.remove(room)
 
-    await this.messageRepository.remove(message)
-
-    return { success: true, message: 'Message deleted successfully' }
+    return { success: true, message: 'Room deleted successfully' }
   }
 }
