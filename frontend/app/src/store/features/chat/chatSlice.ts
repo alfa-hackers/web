@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatState, Chat } from './chatTypes'
 import { loadChats } from './loadChats'
+import { v4 as uuidv4 } from 'uuid'
 
 const initialState: ChatState = {
   chats: [],
@@ -13,10 +14,10 @@ const chatSlice = createSlice({
   initialState,
   reducers: {
     createChat: (state, action: PayloadAction<{ content: string }>) => {
-      const roomId = `room_${Date.now()}`
-      const messageId = `msg_${Date.now()}`
+      const roomId = uuidv4()
+      const messageId = uuidv4()
       const newChat: Chat = {
-        id: Date.now().toString(),
+        id: roomId.toString(),
         title: action.payload.content.slice(0, 30) || 'Новый чат',
         roomId,
         isWaitingForResponse: true,

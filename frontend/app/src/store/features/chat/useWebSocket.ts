@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks'
 import { socketApi } from './socketApi'
 import { selectActiveChatRoomId, selectActiveChat } from './chatSelectors'
 import { createChat, addMessage } from './chatSlice'
+import { v4 as uuidv4 } from 'uuid'
 
 export const useWebSocket = () => {
   const dispatch = useAppDispatch()
@@ -44,20 +45,30 @@ export const useWebSocket = () => {
 
       if (!activeChat) {
         const messageId = `msg_${Date.now()}`
-        const roomId = `room_${Date.now()}`
-        
+        const roomId = uuidv4()
+
         dispatch(createChat({ content }))
-        
+
         setTimeout(() => {
           socketApi.joinRoom(roomId)
           setTimeout(() => {
-            socketApi.sendMessage(roomId, content, messageId, Date.now().toString())
+            socketApi.sendMessage(
+              roomId,
+              content,
+              messageId,
+              Date.now().toString()
+            )
           }, 100)
         }, 50)
       } else {
         const messageId = `msg_${Date.now()}`
         dispatch(addMessage({ chatId: activeChat.id, content }))
-        socketApi.sendMessage(activeChat.roomId, content, messageId, activeChat.id)
+        socketApi.sendMessage(
+          activeChat.roomId,
+          content,
+          messageId,
+          activeChat.id
+        )
       }
     },
     [activeChat, dispatch, isInitializing]
