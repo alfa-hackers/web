@@ -1,64 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { Chat, FileAttachment } from './chatTypes'
-
-const getApiUrl = (): string => {
-  return process.env.NODE_ENV === 'production'
-    ? 'https://api.whirav.ru'
-    : 'http://localhost:3000'
-}
-
-interface ApiMessage {
-  id: string
-  text: string
-  messageType: 'user' | 'assistant'
-  isAi: boolean
-  roomId: string
-  file_address?: string
-  createdAt: string
-  file_name?: string
-}
-
-interface ApiRoom {
-  id: string
-  name: string
-  description: string | null
-}
-
-const fetchFileAsBase64 = async (fileUrl: string): Promise<string> => {
-  try {
-    const response = await fetch(fileUrl)
-    if (!response.ok) throw new Error('Failed to fetch file')
-    const blob = await response.blob()
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64 = reader.result as string
-        resolve(base64.split(',')[1])
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(blob)
-    })
-  } catch (error) {
-    console.error('Error fetching file:', error)
-    return ''
-  }
-}
-
-const getMimeTypeFromUrl = (
-  url: string
-): FileAttachment['mimeType'] | 'application/octet-stream' => {
-  const extension = url.split('.').pop()?.toLowerCase()
-  switch (extension) {
-    case 'pdf':
-      return 'application/pdf'
-    case 'doc':
-      return 'application/msword'
-    case 'docx':
-      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    default:
-      return 'application/octet-stream'
-  }
-}
+import { ApiMessage, ApiRoom } from './apiTypes'
+import { fetchFileAsBase64, getApiUrl } from './utils'
+import { getMimeTypeFromUrl } from './utils'
 
 export const loadChats = createAsyncThunk(
   'chat/loadChats',

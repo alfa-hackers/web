@@ -12,6 +12,7 @@ import { UserRoom } from 'domain/user-room.entity'
 import { MessagesService } from 'controllers/messages/services/messages.service'
 import { MinioService } from 'minio/minio.service'
 import { LoadContextService } from './services/load-context.service'
+import { SaveMinioService } from './services/save-minio.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
@@ -24,6 +25,7 @@ import { LoadContextService } from './services/load-context.service'
     MessagesService,
     MinioService,
     LoadContextService,
+    SaveMinioService,
   ],
   exports: [ClientManagerService],
 })

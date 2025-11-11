@@ -6,19 +6,16 @@ import { Message } from 'domain/message.entity'
 import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
 import { SendMessagePayload, FileAttachment } from '../socket.interface'
-import { MessagesService } from 'controllers/messages/services/messages.service'
-import { MinioService } from 'minio/minio.service'
-import { v4 as uuidv4 } from 'uuid'
 import { LoadContextService } from './load-context.service'
+import { SaveMinioService } from './save-minio.service'
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
-    private readonly messagesService: MessagesService,
-    private readonly minioService: MinioService,
     private readonly loadContextService: LoadContextService,
+    private readonly saveMinioService: SaveMinioService,
   ) {}
 
   async handleMessage(
@@ -52,9 +49,14 @@ export class MessageService {
           case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             extractedText = await this.processDocx(attachment)
             break
+          case 'application/vnd.ms-excel':
+          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+          case 'application/vnd.oasis.opendocument.spreadsheet':
+            extractedText = await this.processExcel(attachment)
+            break
         }
 
-        const savedFileUrl = await this.saveToMinio(attachment, roomId)
+        const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
         if (savedFileUrl) fileUrl = savedFileUrl
 
         if (extractedText) processedContent += `\n\n${extractedText}`
@@ -76,9 +78,7 @@ export class MessageService {
 
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
-
       const aiResponse = await aiService.generateResponse(combinedMessages)
-
       server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
 
       await this.messageRepository.save({
@@ -97,25 +97,6 @@ export class MessageService {
     }
   }
 
-  private async saveToMinio(attachment: FileAttachment, roomId: string): Promise<string> {
-    const bucketName = process.env.MINIO_BUCKET_NAME || 'chat-files'
-    const fileExtension = attachment.filename.split('.').pop()
-    const uniqueFileName = `${roomId}/${uuidv4()}.${fileExtension}`
-    const fileBuffer = Buffer.from(attachment.data, 'base64')
-    const filePath = await this.minioService.uploadFile(
-      bucketName,
-      uniqueFileName,
-      fileBuffer,
-      attachment.mimeType,
-    )
-
-    const protocol = process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http'
-    const minioEndpoint = process.env.MINIO_ENDPOINT
-    const minioPort = process.env.MINIO_PORT
-
-    return `${protocol}://${minioEndpoint}:${minioPort}/${filePath}`
-  }
-
   private async processPdf(attachment: FileAttachment): Promise<string> {
     return `[PDF content: ${attachment.filename}]`
   }
@@ -126,5 +107,9 @@ export class MessageService {
 
   private async processDocx(attachment: FileAttachment): Promise<string> {
     return `[DOCX content: ${attachment.filename}]`
+  }
+
+  private async processExcel(attachment: FileAttachment): Promise<string> {
+    return `[Excel content: ${attachment.filename}]`
   }
 }
