@@ -75,8 +75,9 @@ export class MessageService {
     })
 
     try {
-      const context = await this.loadContextService.loadContext(roomId)
-      const aiResponse = await aiService.generateResponse(processedContent, context)
+      const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
+
+      const aiResponse = await aiService.generateResponse(combinedMessages)
 
       server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
 
