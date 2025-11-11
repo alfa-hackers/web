@@ -9,6 +9,7 @@ import { SendMessagePayload, FileAttachment } from '../socket.interface'
 import { MessagesService } from 'controllers/messages/services/messages.service'
 import { MinioService } from 'minio/minio.service'
 import { v4 as uuidv4 } from 'uuid'
+import { LoadContextService } from './load-context.service'
 
 @Injectable()
 export class MessageService {
@@ -17,6 +18,7 @@ export class MessageService {
     private readonly messageRepository: Repository<Message>,
     private readonly messagesService: MessagesService,
     private readonly minioService: MinioService,
+    private readonly loadContextService: LoadContextService,
   ) {}
 
   async handleMessage(
@@ -73,7 +75,7 @@ export class MessageService {
     })
 
     try {
-      const context = await this.loadContext(roomId)
+      const context = await this.loadContextService.loadContext(roomId)
       const aiResponse = await aiService.generateResponse(processedContent, context)
 
       server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
@@ -111,17 +113,6 @@ export class MessageService {
     const minioPort = process.env.MINIO_PORT
 
     return `${protocol}://${minioEndpoint}:${minioPort}/${filePath}`
-  }
-
-  private async loadContext(
-    roomId: string,
-    limit: number = 50,
-  ): Promise<Array<{ role: string; content: string }>> {
-    const result = await this.messagesService.getMessagesByRoomId({ roomId, limit, offset: 0 })
-    return result.data.reverse().map((msg) => ({
-      role: msg.messageType === 'user' ? 'user' : 'assistant',
-      content: msg.text,
-    }))
   }
 
   private async processPdf(attachment: FileAttachment): Promise<string> {

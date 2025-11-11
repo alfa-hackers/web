@@ -15,6 +15,7 @@ interface ApiMessage {
   roomId: string
   file_address?: string
   createdAt: string
+  file_name?: string
 }
 
 interface ApiRoom {
@@ -112,29 +113,39 @@ export const loadChats = createAsyncThunk(
               }
 
               if (msg.file_address) {
-                const presignedResponse = await fetch(
-                  `${apiUrl}/presigned/download`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileUrl: msg.file_address }),
-                  }
-                )
-
-                if (presignedResponse.ok) {
-                  const { url } = await presignedResponse.json()
-                  const fileName = msg.file_address.split('/').pop() || 'file'
-                  const mimeType = getMimeTypeFromUrl(msg.file_address)
-                  const fileData = await fetchFileAsBase64(url)
-
-                  message.attachments = [
+                try {
+                  // Запрос presigned URL для скачивания из MinIO
+                  const presignedResponse = await fetch(
+                    `${apiUrl}/presigned/download`,
                     {
-                      filename: fileName,
-                      mimeType,
-                      data: fileData,
-                      size: 0,
-                    } as FileAttachment,
-                  ]
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ fileUrl: msg.file_address }),
+                    }
+                  )
+
+                  if (presignedResponse.ok) {
+                    const { url } = await presignedResponse.json()
+
+                    // Берем имя файла из БД, если оно есть, иначе fallback на URL
+                    const fileName =
+                      msg.file_name ||
+                      msg.file_address.split('/').pop() ||
+                      'file'
+                    const mimeType = getMimeTypeFromUrl(msg.file_address)
+                    const fileData = await fetchFileAsBase64(url)
+
+                    message.attachments = [
+                      {
+                        filename: fileName,
+                        mimeType,
+                        data: fileData,
+                        size: 0,
+                      } as FileAttachment,
+                    ]
+                  }
+                } catch (error) {
+                  console.error('Error fetching attachment:', error)
                 }
               }
 
