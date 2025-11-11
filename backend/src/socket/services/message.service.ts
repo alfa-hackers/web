@@ -6,10 +6,15 @@ import { Message } from 'src/domain/message.entity'
 import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
 import { SendMessagePayload, FileAttachment } from '../socket.interface'
+import { MessagesService } from 'src/all_messages/services/messages.service'
 
 @Injectable()
 export class MessageService {
-  constructor(@InjectRepository(Message) private readonly messageRepository: Repository<Message>) {}
+  constructor(
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
+    private readonly messagesService: MessagesService,
+  ) {}
 
   async handleMessage(
     payload: SendMessagePayload,
@@ -60,7 +65,8 @@ export class MessageService {
     })
 
     try {
-      const aiResponse = await aiService.generateResponse(processedContent)
+      const context = await this.loadContext(roomId)
+      const aiResponse = await aiService.generateResponse(processedContent, context)
 
       server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
 
@@ -80,6 +86,22 @@ export class MessageService {
         .emit('message', { userId: 'system', message: `Ошибка AI API: ${error.message}` })
       return { success: false, error: error.message }
     }
+  }
+
+  private async loadContext(
+    roomId: string,
+    limit: number = 50,
+  ): Promise<Array<{ role: string; content: string }>> {
+    const result = await this.messagesService.getMessagesByRoomId({
+      roomId,
+      limit,
+      offset: 0,
+    })
+
+    return result.data.reverse().map((msg) => ({
+      role: msg.messageType === 'user' ? 'user' : 'assistant',
+      content: msg.text,
+    }))
   }
 
   private async processPdf(attachment: FileAttachment): Promise<string> {
