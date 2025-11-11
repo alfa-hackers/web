@@ -42,7 +42,6 @@ export class MessageService {
 
         switch (attachment.mimeType) {
           case 'application/pdf':
-            fileUrl = await this.savePdfToMinio(attachment, roomId)
             extractedText = await this.processPdf(attachment)
             break
           case 'application/msword':
@@ -52,6 +51,9 @@ export class MessageService {
             extractedText = await this.processDocx(attachment)
             break
         }
+
+        const savedFileUrl = await this.saveToMinio(attachment, roomId)
+        if (savedFileUrl) fileUrl = savedFileUrl
 
         if (extractedText) processedContent += `\n\n${extractedText}`
       }
@@ -91,7 +93,7 @@ export class MessageService {
     }
   }
 
-  private async savePdfToMinio(attachment: FileAttachment, roomId: string): Promise<string> {
+  private async saveToMinio(attachment: FileAttachment, roomId: string): Promise<string> {
     const bucketName = process.env.MINIO_BUCKET_NAME || 'chat-files'
     const fileExtension = attachment.filename.split('.').pop()
     const uniqueFileName = `${roomId}/${uuidv4()}.${fileExtension}`
