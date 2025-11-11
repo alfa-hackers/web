@@ -7,6 +7,7 @@ import {
   deleteChat,
 } from '../../store/features/chat/chatSlice'
 import { useWebSocket } from '../../store/features/chat/useWebSocket'
+import { FileAttachment } from '../../store/features/chat/chatTypes'
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import Modal from './Modal'
@@ -32,6 +33,7 @@ const ChatLanding: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { chats, activeChat } = useSelector((state: RootState) => state.chat)
   const [inputValue, setInputValue] = useState('')
+  const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -75,6 +77,7 @@ const ChatLanding: React.FC = () => {
   const handleNewChat = () => {
     dispatch(setCreatingNew(true))
     setInputValue('')
+    setAttachments([])
     setSidebarOpen(false)
   }
 
@@ -82,8 +85,9 @@ const ChatLanding: React.FC = () => {
     const currentChat = chats.find((chat) => chat.id === activeChat)
     const isWaitingForResponse = currentChat?.isWaitingForResponse || false
     if (!inputValue.trim() || !isConnected || isWaitingForResponse) return
-    sendMessage(inputValue)
+    sendMessage(inputValue, attachments.length > 0 ? attachments : undefined)
     setInputValue('')
+    setAttachments([])
   }
 
   const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
@@ -140,6 +144,8 @@ const ChatLanding: React.FC = () => {
         setInputValue={setInputValue}
         onSendMessage={handleSendMessage}
         messagesEndRef={messagesEndRef}
+        attachments={attachments}
+        onAttachmentsChange={setAttachments}
       />
 
       <Modal 

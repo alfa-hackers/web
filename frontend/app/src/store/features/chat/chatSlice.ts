@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChatState, Chat } from './chatTypes'
+import { ChatState, Chat, FileAttachment } from './chatTypes'
 import { loadChats } from './loadChats'
 
 const initialState: ChatState = {
@@ -14,7 +14,11 @@ const chatSlice = createSlice({
   reducers: {
     createChat: (
       state,
-      action: PayloadAction<{ content: string; roomId: string }>
+      action: PayloadAction<{
+        content: string
+        roomId: string
+        attachments?: FileAttachment[]
+      }>
     ) => {
       const messageId = `msg_${Date.now()}`
       const newChat: Chat = {
@@ -28,6 +32,7 @@ const chatSlice = createSlice({
             content: action.payload.content,
             sender: 'user',
             status: 'sending',
+            attachments: action.payload.attachments,
           },
         ],
       }
@@ -38,7 +43,11 @@ const chatSlice = createSlice({
 
     addMessage: (
       state,
-      action: PayloadAction<{ chatId: string; content: string }>
+      action: PayloadAction<{
+        chatId: string
+        content: string
+        attachments?: FileAttachment[]
+      }>
     ) => {
       const chat = state.chats.find((c) => c.id === action.payload.chatId)
       if (chat) {
@@ -49,6 +58,7 @@ const chatSlice = createSlice({
           content: action.payload.content,
           sender: 'user',
           status: 'sending',
+          attachments: action.payload.attachments,
         })
       }
     },

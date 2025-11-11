@@ -4,6 +4,7 @@ import { socketApi } from './socketApi'
 import { selectActiveChatRoomId, selectActiveChat } from './chatSelectors'
 import { createChat, addMessage } from './chatSlice'
 import { v4 as uuidv4 } from 'uuid'
+import { FileAttachment } from './chatTypes'
 
 export const useWebSocket = () => {
   const dispatch = useAppDispatch()
@@ -41,27 +42,28 @@ export const useWebSocket = () => {
   }, [activeChatRoomId, isConnected, isInitializing, activeChat])
 
   const sendMessage = useCallback(
-    (content: string) => {
+    (content: string, attachments?: FileAttachment[]) => {
       if (!content.trim() || isInitializing) return
 
       if (!activeChat) {
         const messageId = `msg_${Date.now()}`
         const roomId = uuidv4()
 
-        dispatch(createChat({ content, roomId }))
+        dispatch(createChat({ content, roomId, attachments }))
 
         setTimeout(() => {
           socketApi.joinRoom(roomId, content)
-          socketApi.sendMessage(roomId, content, messageId, roomId)
+          socketApi.sendMessage(roomId, content, messageId, roomId, attachments)
         }, 150)
       } else {
         const messageId = `msg_${Date.now()}`
-        dispatch(addMessage({ chatId: activeChat.id, content }))
+        dispatch(addMessage({ chatId: activeChat.id, content, attachments }))
         socketApi.sendMessage(
           activeChat.roomId,
           content,
           messageId,
-          activeChat.id
+          activeChat.id,
+          attachments
         )
       }
     },
