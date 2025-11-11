@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { FastifyRequest } from 'fastify'
-import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator'
+import { IS_PUBLIC_KEY } from 'common/decorators/public.decorator'
 import axios from 'axios'
 
 @Injectable()

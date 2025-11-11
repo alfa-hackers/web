@@ -1,1 +1,1 @@
-export * from './redis.provider'
+export * from 'session/providers/redis.provider'

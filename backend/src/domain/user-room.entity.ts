@@ -6,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
-import { User } from './user.entity'
-import { Room } from './room.entity'
+import { User } from 'domain/user.entity'
+import { Room } from 'domain/room.entity'
 
 @Entity('user_rooms')
 export class UserRoom {

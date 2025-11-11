@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
-import { MessagesService } from '../services/messages.service'
-import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from '../dto/messages.dto'
+import { MessagesService } from 'controllers/messages/services/messages.service'
+import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
 import { ApiBody } from '@nestjs/swagger'
 
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  @Post('all')
+  @Post('/by-user')
   @ApiBody({
     description: 'Запрос сообщений пользователя',
-    type: GetMessagesQueryDto,
+    type: GetUserMessagesDto,
     examples: {
       example1: {
         summary: 'Пример запроса сообщений',
@@ -22,11 +22,11 @@ export class MessagesController {
       },
     },
   })
-  async getMessages(@Body() body: GetMessagesQueryDto) {
+  async getUserMessages(@Body() body: GetUserMessagesDto) {
     return this.messagesService.getMessagesByUserId(body)
   }
 
-  @Post('messages')
+  @Post('/by-room')
   @ApiBody({
     description: 'Получение всех сообщений конкретной комнаты',
     type: GetRoomMessagesDto,
@@ -45,31 +45,8 @@ export class MessagesController {
     return this.messagesService.getMessagesByRoomId(body)
   }
 
-  @Post('rooms')
-  @ApiBody({
-    description: 'Запрос комнат пользователя',
-    type: GetUserRoomsQueryDto,
-    examples: {
-      example1: {
-        summary: 'Пример запроса комнат',
-        value: {
-          userId: '15f29d79-e862-4250-bebf-75f7a0ab69db',
-        },
-      },
-    },
-  })
-  async getUserRooms(@Body() body: GetUserRoomsQueryDto) {
-    return this.messagesService.getRoomsByUserId(body)
-  }
-
-  @Get(':id')
+  @Get('/:id')
   async getMessageById(@Param('id') id: string) {
     return this.messagesService.getMessageById(id)
-  }
-
-  @Delete('room/:id')
-  @HttpCode(HttpStatus.OK)
-  async deleteRoom(@Param('id') id: string) {
-    return this.messagesService.deleteRoom(id)
   }
 }

@@ -1,0 +1,130 @@
+@import "../Global/variables.scss";
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Modal Content */
+.modal-content {
+  background: $color-white;
+  border-radius: $radius-md;
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease;
+  color: $color-text;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  color: $color-text;
+  margin: 0;
+}
+
+/* Close Button */
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: $color-text;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $color-alfa;
+  }
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 1rem;
+  color: $color-text-light;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-sm;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: $color-accent;
+  }
+}
+
+/* Submit Button */
+.submit-btn {
+  padding: 12px;
+  background-color: $color-accent;
+  color: $color-white;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $color-accent-hover;
+  }
+
+  &:active {
+    background-color: darken($color-accent, 10%);
+  }
+
+  &:disabled {
+    background-color: $color-border-light;
+    cursor: not-allowed;
+  }
+}
+
+/* Animation for Modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

@@ -1,10 +1,10 @@
 services:
-  app:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - '3001:3001'
+  # app:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3001:3001'
 
   redis:
     image: 'docker.io/bitnami/redis:latest'

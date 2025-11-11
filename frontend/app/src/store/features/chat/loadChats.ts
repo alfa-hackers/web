@@ -26,7 +26,7 @@ export const loadChats = createAsyncThunk(
   async (userId: string) => {
     const apiUrl = getApiUrl()
 
-    const roomsResponse = await fetch(`${apiUrl}/messages/rooms`, {
+    const roomsResponse = await fetch(`${apiUrl}/rooms/by-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export const loadChats = createAsyncThunk(
     const chatsWithMessages = await Promise.all(
       rooms.map(async (room) => {
         try {
-          const messagesResponse = await fetch(`${apiUrl}/messages/messages`, {
+          const messagesResponse = await fetch(`${apiUrl}/messages/by-room`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export const loadRoomMessages = createAsyncThunk(
   async (roomId: string) => {
     const apiUrl = getApiUrl()
 
-    const messagesResponse = await fetch(`${apiUrl}/messages/messages`, {
+    const messagesResponse = await fetch(`${apiUrl}/messages/by-room`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

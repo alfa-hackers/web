@@ -18,7 +18,7 @@ class SocketApi {
 
     const isDev = process.env.NODE_ENV === 'development'
     const getSocketUrl = () =>
-      isDev ? 'http://localhost:3000' : 'wss://api.whirav.ru'
+      isDev ? 'http://localhost:3000' : 'ws://api.whirav.ru'
 
     this.socket = io(getSocketUrl(), {
       transports: ['websocket', 'polling'],

@@ -1,10 +1,10 @@
 import { Injectable, ForbiddenException, HttpStatus, ConflictException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { AuthDto, LoginDto } from '../dto'
+import { AuthDto, LoginDto } from 'controllers/auth/dto'
 import { Configuration, IdentityApi, FrontendApi } from '@ory/kratos-client'
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { User } from 'src/domain/user.entity'
+import { User } from 'domain/user.entity'
 import axios from 'axios'
 
 @Injectable()

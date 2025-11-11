@@ -132,7 +132,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         <textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyUp={handleKeyPress}
           placeholder={
             isWaitingForResponse
               ? 'Ожидание ответа...'

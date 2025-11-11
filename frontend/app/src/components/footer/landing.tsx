@@ -10,6 +10,7 @@ import { useWebSocket } from '../../store/features/chat/useWebSocket'
 import { FileAttachment } from '../../store/features/chat/chatTypes'
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
+import Modal from './Modal'
 import '../../styles/landing/landing.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
 
@@ -34,6 +35,7 @@ const ChatLanding: React.FC = () => {
   const [inputValue, setInputValue] = useState('')
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { sendMessage, isConnected } = useWebSocket()
 
@@ -63,6 +65,14 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
+  
+  const handleLoginClick = () => {
+    setModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+  }
 
   const handleNewChat = () => {
     dispatch(setCreatingNew(true))
@@ -96,12 +106,20 @@ const ChatLanding: React.FC = () => {
 
   return (
     <div className="chat-landing">
-      <button
-        className="mobile-menu-btn"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        ☰
-      </button>
+      <div className="header-actions">
+        <button 
+          className="login-btn" 
+          onClick={() => setModalOpen(!modalOpen)}
+        >
+          🔒
+        </button>
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          ☰
+        </button>
+      </div>
 
       {sidebarOpen && (
         <div
@@ -128,6 +146,11 @@ const ChatLanding: React.FC = () => {
         messagesEndRef={messagesEndRef}
         attachments={attachments}
         onAttachmentsChange={setAttachments}
+      />
+
+      <Modal 
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
       />
     </div>
   )

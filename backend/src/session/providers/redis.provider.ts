@@ -1,6 +1,6 @@
 import IORedis from 'ioredis'
 import { Logger } from '@nestjs/common'
-import * as RedisConstants from '../constants'
+import * as RedisConstants from 'session/constants'
 
 const logger = new Logger('Redis')
 

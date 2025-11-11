@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { AuthDto, LoginDto } from './dto'
-import { AuthService } from './services/auth.service'
+import { AuthDto, LoginDto } from 'controllers/auth/dto'
+import { AuthService } from 'controllers/auth/services/auth.service'
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { Public } from 'src/common/decorators'
+import { Public } from 'common/decorators'
 
 @ApiTags('Authentication')
 @Controller('auth')

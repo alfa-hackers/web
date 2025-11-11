@@ -1,8 +1,8 @@
 import 'reflect-metadata'
-import { Message } from 'src/domain/message.entity'
-import { Room } from 'src/domain/room.entity'
-import { UserRoom } from 'src/domain/user-room.entity'
-import { User } from 'src/domain/user.entity'
+import { Message } from 'domain/message.entity'
+import { Room } from 'domain/room.entity'
+import { UserRoom } from 'domain/user-room.entity'
+import { User } from 'domain/user.entity'
 import { DataSource } from 'typeorm'
 
 export const AppDataSource = new DataSource({
