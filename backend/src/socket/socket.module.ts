@@ -10,6 +10,7 @@ import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { UserRoom } from 'domain/user-room.entity'
 import { MessagesService } from 'controllers/messages/services/messages.service'
+import { MinioService } from 'minio/minio.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
@@ -20,6 +21,7 @@ import { MessagesService } from 'controllers/messages/services/messages.service'
     RoomService,
     MessageService,
     MessagesService,
+    MinioService,
   ],
   exports: [ClientManagerService],
 })

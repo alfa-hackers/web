@@ -7,6 +7,8 @@ import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
 import { SendMessagePayload, FileAttachment } from '../socket.interface'
 import { MessagesService } from 'controllers/messages/services/messages.service'
+import { MinioService } from 'minio/minio.service'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class MessageService {
@@ -14,6 +16,7 @@ export class MessageService {
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
     private readonly messagesService: MessagesService,
+    private readonly minioService: MinioService,
   ) {}
 
   async handleMessage(
@@ -25,13 +28,13 @@ export class MessageService {
   ) {
     const { roomId, message, attachments } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
-    const userTempId = socket.data.userTempId
-    const dbUserId = socket.data.dbUserId
+    const { userTempId, dbUserId } = socket.data
 
     if (!userId) return { success: false, error: 'User not identified' }
     if (!socket.rooms.has(roomId)) return { success: false, error: 'You must join the room first' }
 
     let processedContent = message
+    let fileUrl: string | null = null
 
     if (attachments?.length) {
       for (const attachment of attachments) {
@@ -39,6 +42,7 @@ export class MessageService {
 
         switch (attachment.mimeType) {
           case 'application/pdf':
+            fileUrl = await this.savePdfToMinio(attachment, roomId)
             extractedText = await this.processPdf(attachment)
             break
           case 'application/msword':
@@ -62,6 +66,7 @@ export class MessageService {
       userId: dbUserId,
       isAi: false,
       messageType: 'user',
+      file_address: fileUrl,
     })
 
     try {
@@ -81,23 +86,35 @@ export class MessageService {
 
       return { success: true }
     } catch (error) {
-      server
-        .to(roomId)
-        .emit('message', { userId: 'system', message: `Ошибка AI API: ${error.message}` })
+      server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
       return { success: false, error: error.message }
     }
+  }
+
+  private async savePdfToMinio(attachment: FileAttachment, roomId: string): Promise<string> {
+    const bucketName = process.env.MINIO_BUCKET_NAME || 'chat-files'
+    const fileExtension = attachment.filename.split('.').pop()
+    const uniqueFileName = `${roomId}/${uuidv4()}.${fileExtension}`
+    const fileBuffer = Buffer.from(attachment.data, 'base64')
+    const filePath = await this.minioService.uploadFile(
+      bucketName,
+      uniqueFileName,
+      fileBuffer,
+      attachment.mimeType,
+    )
+
+    const protocol = process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http'
+    const minioEndpoint = process.env.MINIO_ENDPOINT
+    const minioPort = process.env.MINIO_PORT
+
+    return `${protocol}://${minioEndpoint}:${minioPort}/${filePath}`
   }
 
   private async loadContext(
     roomId: string,
     limit: number = 50,
   ): Promise<Array<{ role: string; content: string }>> {
-    const result = await this.messagesService.getMessagesByRoomId({
-      roomId,
-      limit,
-      offset: 0,
-    })
-
+    const result = await this.messagesService.getMessagesByRoomId({ roomId, limit, offset: 0 })
     return result.data.reverse().map((msg) => ({
       role: msg.messageType === 'user' ? 'user' : 'assistant',
       content: msg.text,
@@ -105,32 +122,14 @@ export class MessageService {
   }
 
   private async processPdf(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processPdf')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое PDF файла: ${attachment.filename}]`
+    return `[PDF content: ${attachment.filename}]`
   }
 
   private async processDoc(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processDoc')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое DOC файла: ${attachment.filename}]`
+    return `[DOC content: ${attachment.filename}]`
   }
 
   private async processDocx(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processDocx')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое DOCX файла: ${attachment.filename}]`
+    return `[DOCX content: ${attachment.filename}]`
   }
 }

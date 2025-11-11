@@ -22,6 +22,9 @@ export class Message {
   audio_address?: string
 
   @Column({ type: 'varchar', nullable: true })
+  file_address?: string
+
+  @Column({ type: 'varchar', nullable: true })
   voice_address?: string
 
   @Column({ type: 'varchar', default: 'user' })
