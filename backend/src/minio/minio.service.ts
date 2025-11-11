@@ -37,4 +37,18 @@ export class MinioService {
       throw new InternalServerErrorException('Ошибка при загрузке файла в MinIO')
     }
   }
+
+  async getPresignedUrl(
+    bucketName: string,
+    fileName: string,
+    expiresInSeconds = 3600,
+  ): Promise<string> {
+    try {
+      const url = await this.minioClient.presignedGetObject(bucketName, fileName, expiresInSeconds)
+      return url
+    } catch (error) {
+      console.error(error)
+      throw new InternalServerErrorException('Ошибка при получении pre-signed URL')
+    }
+  }
 }
