@@ -9,11 +9,19 @@ interface MessageItemProps {
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
   return (
     <div className={`message ${message.sender}`}>
-      {message.sender === 'user' && (
-        <div className="message-avatar">👤</div>
-      )}
+      {message.sender === 'user' && <div className="message-avatar">👤</div>}
       <div className="message-bubble">
         <div className="message-content">{message.content}</div>
+
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="message-attachments">
+            {message.attachments.map((attachment, index) => (
+              <div key={index} className="attachment-badge">
+                📄 {attachment.filename}
+              </div>
+            ))}
+          </div>
+        )}
 
         {message.status && message.sender === 'user' && (
           <div className="message-status">

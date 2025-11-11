@@ -1,8 +1,19 @@
+export interface FileAttachment {
+  filename: string
+  mimeType:
+    | 'application/pdf'
+    | 'application/msword'
+    | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  data: string
+  size: number
+}
+
 export interface Message {
   id: string
   content: string
   sender: 'user' | 'assistant'
   status?: 'sending' | 'sent' | 'error'
+  attachments?: FileAttachment[]
 }
 
 export interface Chat {

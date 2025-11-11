@@ -1,5 +1,6 @@
 import React from 'react'
 import { Chat } from '../../store/features/chat/chatTypes'
+import { FileAttachment } from '../../store/features/chat/chatTypes'
 import WelcomeScreen from './WelcomeScreen'
 import MessagesList from './MessagesList'
 import InputArea from './InputArea'
@@ -12,6 +13,8 @@ interface MainViewportProps {
   setInputValue: (value: string) => void
   onSendMessage: () => void
   messagesEndRef: React.RefObject<HTMLDivElement | null>
+  attachments: FileAttachment[]
+  onAttachmentsChange: (attachments: FileAttachment[]) => void
 }
 
 const MainViewport: React.FC<MainViewportProps> = ({
@@ -21,6 +24,8 @@ const MainViewport: React.FC<MainViewportProps> = ({
   setInputValue,
   onSendMessage,
   messagesEndRef,
+  attachments,
+  onAttachmentsChange,
 }) => {
   const hasMessages = currentChat?.messages && currentChat.messages.length > 0
   const isWaitingForResponse = currentChat?.isWaitingForResponse || false
@@ -44,6 +49,8 @@ const MainViewport: React.FC<MainViewportProps> = ({
         isConnected={isConnected}
         isWaitingForResponse={isWaitingForResponse}
         hasMessages={hasMessages}
+        attachments={attachments}
+        onAttachmentsChange={onAttachmentsChange}
       />
     </main>
   )
