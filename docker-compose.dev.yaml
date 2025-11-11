@@ -92,7 +92,38 @@ services:
       - uploads_data:/app/uploads
       - static_data:/app/static
 
+  minio:
+    image: 'minio/minio'
+    container_name: 'minio'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      TZ: 'Europe/Omsk'
+    ports:
+      - '${MINIO_PORT}:${MINIO_PORT}'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    networks:
+      - app
+    restart: always
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1m'
+        max-file: '3'
+    mem_limit: 2G
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: >
+        sh -c "mc alias set local http://localhost:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} && mc admin info local"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
 volumes:
+  minio_data:
   pg_data:
   static_data:
   uploads_data:
