@@ -69,6 +69,7 @@ export class MessageService {
       isAi: false,
       messageType: 'user',
       file_address: fileUrl,
+      file_name: attachments?.length ? attachments[0].filename : null,
     })
 
     try {

@@ -13,7 +13,7 @@ interface ApiMessage {
   messageType: 'user' | 'assistant'
   isAi: boolean
   roomId: string
-  file_address?: string // ИСПРАВЛЕНО: было fileUrl
+  file_address?: string
   createdAt: string
 }
 
@@ -26,9 +26,7 @@ interface ApiRoom {
 const fetchFileAsBase64 = async (fileUrl: string): Promise<string> => {
   try {
     const response = await fetch(fileUrl)
-    if (!response.ok) {
-      throw new Error('Failed to fetch file')
-    }
+    if (!response.ok) throw new Error('Failed to fetch file')
     const blob = await response.blob()
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -45,24 +43,25 @@ const fetchFileAsBase64 = async (fileUrl: string): Promise<string> => {
   }
 }
 
-const getMimeTypeFromUrl = (url: string): FileAttachment['mimeType'] => {
+const getMimeTypeFromUrl = (
+  url: string
+): FileAttachment['mimeType'] | 'application/octet-stream' => {
   const extension = url.split('.').pop()?.toLowerCase()
-
-  if (extension === 'pdf') {
-    return 'application/pdf'
-  } else if (extension === 'doc') {
-    return 'application/msword'
-  } else if (extension === 'docx') {
-    return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  switch (extension) {
+    case 'pdf':
+      return 'application/pdf'
+    case 'doc':
+      return 'application/msword'
+    case 'docx':
+      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    default:
+      return 'application/octet-stream'
   }
-
-  return 'application/pdf'
 }
 
 export const loadChats = createAsyncThunk(
   'chat/loadChats',
   async (userId: string) => {
-    console.log(`[loadChats] Start loading chats for user: ${userId}`)
     const apiUrl = getApiUrl()
 
     const roomsResponse = await fetch(`${apiUrl}/rooms/by-user`, {
@@ -71,9 +70,7 @@ export const loadChats = createAsyncThunk(
       body: JSON.stringify({ userId }),
     })
 
-    if (!roomsResponse.ok) {
-      throw new Error('Failed to load chats')
-    }
+    if (!roomsResponse.ok) throw new Error('Failed to load chats')
 
     const roomsResult = await roomsResponse.json()
     const rooms: ApiRoom[] = roomsResult.data
@@ -88,7 +85,6 @@ export const loadChats = createAsyncThunk(
           })
 
           if (!messagesResponse.ok) {
-            console.log(`Failed to load messages for room ${room.id}`)
             return {
               id: room.id,
               title: room.name || 'Новый чат',
@@ -125,20 +121,11 @@ export const loadChats = createAsyncThunk(
                   }
                 )
 
-                if (!presignedResponse.ok) {
-                  console.log(
-                    `Failed to get presigned URL for file: ${msg.file_address}`
-                  )
-                } else {
+                if (presignedResponse.ok) {
                   const { url } = await presignedResponse.json()
-                  const fileName =
-                    msg.file_address.split('/').pop() || 'file.pdf'
+                  const fileName = msg.file_address.split('/').pop() || 'file'
                   const mimeType = getMimeTypeFromUrl(msg.file_address)
                   const fileData = await fetchFileAsBase64(url)
-
-                  if (mimeType === 'application/pdf') {
-                    console.log(`PDF loaded: ${fileName}`)
-                  }
 
                   message.attachments = [
                     {
@@ -163,7 +150,6 @@ export const loadChats = createAsyncThunk(
             isWaitingForResponse: false,
           }
         } catch (error) {
-          console.log(`Error loading messages for room ${room.id}:`, error)
           return {
             id: room.id,
             title: room.name || 'Новый чат',
@@ -186,15 +172,11 @@ export const loadRoomMessages = createAsyncThunk(
 
     const messagesResponse = await fetch(`${apiUrl}/messages/by-room`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomId }),
     })
 
-    if (!messagesResponse.ok) {
-      throw new Error('Failed to load room messages')
-    }
+    if (!messagesResponse.ok) throw new Error('Failed to load room messages')
 
     const messagesResult = await messagesResponse.json()
     const messages: ApiMessage[] = messagesResult.data || []
@@ -213,16 +195,15 @@ export const loadRoomMessages = createAsyncThunk(
           status: 'sent',
         }
 
-        // ИСПРАВЛЕНО: используем file_address вместо fileUrl
         if (msg.file_address) {
-          const fileName = msg.file_address.split('/').pop() || 'file.pdf'
+          const fileName = msg.file_address.split('/').pop() || 'file'
           const mimeType = getMimeTypeFromUrl(msg.file_address)
           const fileData = await fetchFileAsBase64(msg.file_address)
 
           message.attachments = [
             {
               filename: fileName,
-              mimeType: mimeType,
+              mimeType,
               data: fileData,
               size: 0,
             } as FileAttachment,

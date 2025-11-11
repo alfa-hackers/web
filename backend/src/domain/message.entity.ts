@@ -25,7 +25,7 @@ export class Message {
   file_address?: string
 
   @Column({ type: 'varchar', nullable: true })
-  voice_address?: string
+  file_name?: string
 
   @Column({ type: 'varchar', default: 'user' })
   messageType: string
