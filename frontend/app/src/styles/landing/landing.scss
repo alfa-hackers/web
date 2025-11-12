@@ -1,7 +1,7 @@
-@import '../Global/variables';
-@import '../Media/mobile';
-@import './sidebar';
-@import './viewport';
+@import '../Global/variables.scss';
+@import '../Media/mobile.scss';
+@import './sidebar.scss';
+@import './viewport.scss';
 
 .chat-landing {
   display: flex;
@@ -79,7 +79,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgb(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.5);
     animation: typing 1.4s ease-in-out infinite;
 
     &:nth-child(2) {
