@@ -48,6 +48,9 @@ const InputArea: React.FC<InputAreaProps> = ({
         'application/pdf',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.oasis.opendocument.spreadsheet',
       ]
 
       if (!allowedTypes.includes(file.type)) {

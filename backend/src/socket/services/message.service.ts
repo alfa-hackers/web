@@ -5,12 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Message } from 'domain/message.entity'
 import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
-import { SendMessagePayload, FileAttachment } from '../socket.interface'
+import { SendMessagePayload } from '../socket.interface'
 import { LoadContextService } from './load-context.service'
 import { SaveMinioService } from './save-minio.service'
 import { PdfResponseService } from './responses/pdf-response.service'
 import { WordResponseService } from './responses/word-response.service'
 import { ExcelResponseService } from './responses/excel-response.service'
+import { PdfProcessService } from './payloads/pdf-process.service'
+import { WordProcessService } from './payloads/word-process.service'
+import { ExcelProcessService } from './payloads/excel-process.service'
 
 @Injectable()
 export class MessageService {
@@ -22,6 +25,9 @@ export class MessageService {
     private readonly pdfResponseService: PdfResponseService,
     private readonly wordResponseService: WordResponseService,
     private readonly excelResponseService: ExcelResponseService,
+    private readonly pdfProcessService: PdfProcessService,
+    private readonly wordProcessService: WordProcessService,
+    private readonly excelProcessService: ExcelProcessService,
   ) {}
 
   async handleMessage(
@@ -46,18 +52,18 @@ export class MessageService {
         let extractedText = ''
         switch (attachment.mimeType) {
           case 'application/pdf':
-            extractedText = await this.processPdf(attachment)
+            extractedText = await this.pdfProcessService.process(attachment)
             break
           case 'application/msword':
-            extractedText = await this.processDoc(attachment)
+            extractedText = await this.wordProcessService.processDoc(attachment)
             break
           case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            extractedText = await this.processDocx(attachment)
+            extractedText = await this.wordProcessService.processDocx(attachment)
             break
           case 'application/vnd.ms-excel':
           case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
           case 'application/vnd.oasis.opendocument.spreadsheet':
-            extractedText = await this.processExcel(attachment)
+            extractedText = await this.excelProcessService.process(attachment)
             break
         }
         const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
@@ -89,19 +95,19 @@ export class MessageService {
       switch (messageFlag) {
         case 'pdf':
           responseFileUrl = await this.pdfResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
+          formattedResponse = ''
           break
         case 'word':
           responseFileUrl = await this.wordResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
+          formattedResponse = ''
           break
         case 'excel':
           responseFileUrl = await this.excelResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
+          formattedResponse = ''
           break
         case 'text':
         default:
-          formattedResponse = aiResponse.content
+          formattedResponse = ''
           break
       }
 
@@ -128,21 +134,5 @@ export class MessageService {
       server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
       return { success: false, error: error.message }
     }
-  }
-
-  private async processPdf(attachment: FileAttachment): Promise<string> {
-    return `[PDF content: ${attachment.filename}]`
-  }
-
-  private async processDoc(attachment: FileAttachment): Promise<string> {
-    return `[DOC content: ${attachment.filename}]`
-  }
-
-  private async processDocx(attachment: FileAttachment): Promise<string> {
-    return `[DOCX content: ${attachment.filename}]`
-  }
-
-  private async processExcel(attachment: FileAttachment): Promise<string> {
-    return `[Excel content: ${attachment.filename}]`
   }
 }

@@ -16,6 +16,9 @@ import { SaveMinioService } from './services/save-minio.service'
 import { ExcelResponseService } from './services/responses/excel-response.service'
 import { PdfResponseService } from './services/responses/pdf-response.service'
 import { WordResponseService } from './services/responses/word-response.service'
+import { WordProcessService } from './services/payloads/word-process.service'
+import { PdfProcessService } from './services/payloads/pdf-process.service'
+import { ExcelProcessService } from './services/payloads/excel-process.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
@@ -32,6 +35,9 @@ import { WordResponseService } from './services/responses/word-response.service'
     ExcelResponseService,
     PdfResponseService,
     WordResponseService,
+    WordProcessService,
+    PdfProcessService,
+    ExcelProcessService,
   ],
   exports: [ClientManagerService],
 })

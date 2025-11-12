@@ -7,8 +7,6 @@ export class WordResponseService {
   constructor(private readonly saveMinioService: SaveMinioService) {}
 
   async generate(content: string, roomId: string): Promise<string> {
-    console.log(`[${new Date().toISOString()}] [WordResponseService] generate() called`)
-
     try {
       const doc = new Document({
         sections: [
@@ -33,10 +31,8 @@ export class WordResponseService {
         roomId,
       )
 
-      console.log(`✅ Word document uploaded to MinIO: ${fileUrl}`)
       return fileUrl
     } catch (error) {
-      console.error('❌ Error generating or uploading Word document:', error)
       throw error
     }
   }
