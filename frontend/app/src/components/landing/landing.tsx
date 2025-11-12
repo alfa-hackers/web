@@ -69,14 +69,6 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
-  
-  const handleLoginClick = () => {
-    setModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-  }
 
   const handleLoginClick = () => {
     setModalOpen(true)
@@ -123,14 +115,10 @@ const ChatLanding: React.FC = () => {
   return (
     <div className="chat-landing">
       <div className="header-actions">
-<<<<<<< HEAD:frontend/app/src/components/landing/landing.tsx
-        <button className="login-btn" onClick={() => setModalOpen(!modalOpen)}>
-=======
         <button 
           className="login-btn" 
           onClick={() => setModalOpen(!modalOpen)}
         >
->>>>>>> 331c97a (feat: added login modal & documents handling):frontend/app/src/components/footer/landing.tsx
           🔒
         </button>
         <button
@@ -168,14 +156,10 @@ const ChatLanding: React.FC = () => {
         onAttachmentsChange={setAttachments}
       />
 
-<<<<<<< HEAD:frontend/app/src/components/landing/landing.tsx
-      <Modal isOpen={modalOpen} onClose={handleCloseModal} />
-=======
       <Modal 
         isOpen={modalOpen}
         onClose={handleCloseModal}
       />
->>>>>>> 331c97a (feat: added login modal & documents handling):frontend/app/src/components/footer/landing.tsx
     </div>
   )
 }
