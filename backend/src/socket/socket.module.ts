@@ -13,6 +13,9 @@ import { MessagesService } from 'controllers/messages/services/messages.service'
 import { MinioService } from 'minio/minio.service'
 import { LoadContextService } from './services/load-context.service'
 import { SaveMinioService } from './services/save-minio.service'
+import { ExcelResponseService } from './services/responses/excel-response.service'
+import { PdfResponseService } from './services/responses/pdf-response.service'
+import { WordResponseService } from './services/responses/word-response.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
@@ -26,6 +29,9 @@ import { SaveMinioService } from './services/save-minio.service'
     MinioService,
     LoadContextService,
     SaveMinioService,
+    ExcelResponseService,
+    PdfResponseService,
+    WordResponseService,
   ],
   exports: [ClientManagerService],
 })

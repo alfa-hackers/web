@@ -7,6 +7,21 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
+  // Преобразуем base64 в Blob URL для скачивания
+  const getDownloadUrl = (attachment: any) => {
+    try {
+      const byteString = atob(attachment.data.split(',')[1] || attachment.data)
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
+      for (let i = 0; i < byteString.length; i++)
+        ia[i] = byteString.charCodeAt(i)
+      const blob = new Blob([ab], { type: attachment.mimeType })
+      return URL.createObjectURL(blob)
+    } catch {
+      return ''
+    }
+  }
+
   return (
     <div className={`message ${message.sender}`}>
       {message.sender === 'user' && <div className="message-avatar">👤</div>}
@@ -15,11 +30,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
 
         {message.attachments && message.attachments.length > 0 && (
           <div className="message-attachments">
-            {message.attachments.map((attachment, index) => (
-              <div key={index} className="attachment-badge">
-                📄 {attachment.filename}
-              </div>
-            ))}
+            {message.attachments.map((attachment, index) => {
+              const downloadUrl = getDownloadUrl(attachment)
+              return (
+                <a
+                  key={index}
+                  href={downloadUrl}
+                  download={attachment.filename}
+                  className="attachment-badge"
+                >
+                  📄 {attachment.filename}
+                </a>
+              )
+            })}
           </div>
         )}
 
