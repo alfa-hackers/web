@@ -1,6 +1,6 @@
 import React from 'react'
 import '@/styles/MainLayout/index.scss'
-import Footer from '../../footer/Footer'
+import Footer from '../../landing/Footer'
 
 const MainLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
