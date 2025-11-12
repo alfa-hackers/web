@@ -47,3 +47,22 @@ export const getMimeTypeFromUrl = (
       return 'application/octet-stream'
   }
 }
+
+export const getPresignedUrl = async (
+  fileUrl: string
+): Promise<string | null> => {
+  try {
+    const apiUrl = getApiUrl()
+    const response = await fetch(`${apiUrl}/presigned/download`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileUrl }),
+    })
+    if (!response.ok) return null
+    const result = await response.json()
+    return result.url
+  } catch (error) {
+    console.error('Error fetching presigned URL:', error)
+    return null
+  }
+}

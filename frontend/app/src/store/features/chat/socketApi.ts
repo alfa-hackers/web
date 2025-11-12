@@ -1,11 +1,8 @@
 import { io, Socket } from 'socket.io-client'
 import { AppDispatch } from '../../store'
-import {
-  updateMessageStatus,
-  setWaitingForResponse,
-  processAssistantMessageWithFile,
-} from './chatSlice'
+import { updateMessageStatus, setWaitingForResponse } from './chatSlice'
 import { FileAttachment, MessageFlag } from './chatTypes'
+import { processAssistantMessageWithFile } from './apiAiWithFileProcess'
 
 class SocketApi {
   private socket: Socket | null = null
