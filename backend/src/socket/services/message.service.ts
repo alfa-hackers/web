@@ -88,11 +88,20 @@ export class MessageService {
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
       const temperatureMap: Record<string, number> = {
-        text: 1,
-        pdf: 0.5,
-        word: 0.6,
-        excel: 0.2,
+        text: process.env.MODEL_TEMPERATURE_TEXT
+          ? parseFloat(process.env.MODEL_TEMPERATURE_TEXT)
+          : 1.4,
+        pdf: process.env.MODEL_TEMPERATURE_PDF
+          ? parseFloat(process.env.MODEL_TEMPERATURE_PDF)
+          : 0.6,
+        word: process.env.MODEL_TEMPERATURE_WORD
+          ? parseFloat(process.env.MODEL_TEMPERATURE_WORD)
+          : 1.2,
+        excel: process.env.MODEL_TEMPERATURE_EXCEL
+          ? parseFloat(process.env.MODEL_TEMPERATURE_EXCEL)
+          : 0.6,
       }
+
       const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
       const aiResponse = await aiService.generateResponse(
         combinedMessages,
