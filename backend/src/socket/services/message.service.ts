@@ -88,13 +88,17 @@ export class MessageService {
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
       const temperatureMap: Record<string, number> = {
-        text: 0.7,
+        text: 1,
         pdf: 0.5,
         word: 0.6,
-        excel: 1,
+        excel: 0.2,
       }
       const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
-      const aiResponse = await aiService.generateResponse(combinedMessages, temperature)
+      const aiResponse = await aiService.generateResponse(
+        combinedMessages,
+        temperature,
+        messageFlag,
+      )
 
       let formattedResponse: string
       let responseFileUrl: string | null = null
