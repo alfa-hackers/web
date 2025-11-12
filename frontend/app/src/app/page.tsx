@@ -3,7 +3,7 @@
 import React, { useRef } from 'react'
 import { Provider } from 'react-redux'
 import { store } from '@/store/store'
-import ChatLanding from '../components/footer/landing'
+import ChatLanding from '../components/landing/landing'
 import '@/styles/Global/index.scss'
 
 export default function Home() {

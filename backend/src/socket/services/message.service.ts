@@ -5,15 +5,29 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Message } from 'domain/message.entity'
 import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
-import { SendMessagePayload, FileAttachment } from '../socket.interface'
-import { MessagesService } from 'controllers/messages/services/messages.service'
+import { SendMessagePayload } from '../socket.interface'
+import { LoadContextService } from './load-context.service'
+import { SaveMinioService } from './save-minio.service'
+import { PdfResponseService } from './responses/pdf-response.service'
+import { WordResponseService } from './responses/word-response.service'
+import { ExcelResponseService } from './responses/excel-response.service'
+import { PdfProcessService } from './payloads/pdf-process.service'
+import { WordProcessService } from './payloads/word-process.service'
+import { ExcelProcessService } from './payloads/excel-process.service'
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
-    private readonly messagesService: MessagesService,
+    private readonly loadContextService: LoadContextService,
+    private readonly saveMinioService: SaveMinioService,
+    private readonly pdfResponseService: PdfResponseService,
+    private readonly wordResponseService: WordResponseService,
+    private readonly excelResponseService: ExcelResponseService,
+    private readonly pdfProcessService: PdfProcessService,
+    private readonly wordProcessService: WordProcessService,
+    private readonly excelProcessService: ExcelProcessService,
   ) {}
 
   async handleMessage(
@@ -23,32 +37,37 @@ export class MessageService {
     server,
     aiService: AIService,
   ) {
-    const { roomId, message, attachments } = payload
+    const { roomId, message, attachments, messageFlag = 'text', temperature: customTemp } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
-    const userTempId = socket.data.userTempId
-    const dbUserId = socket.data.dbUserId
+    const { userTempId, dbUserId } = socket.data
 
     if (!userId) return { success: false, error: 'User not identified' }
     if (!socket.rooms.has(roomId)) return { success: false, error: 'You must join the room first' }
 
     let processedContent = message
+    let fileUrl: string | null = null
 
     if (attachments?.length) {
       for (const attachment of attachments) {
         let extractedText = ''
-
         switch (attachment.mimeType) {
           case 'application/pdf':
-            extractedText = await this.processPdf(attachment)
+            extractedText = await this.pdfProcessService.process(attachment)
             break
           case 'application/msword':
-            extractedText = await this.processDoc(attachment)
+            extractedText = await this.wordProcessService.processDoc(attachment)
             break
           case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            extractedText = await this.processDocx(attachment)
+            extractedText = await this.wordProcessService.processDocx(attachment)
+            break
+          case 'application/vnd.ms-excel':
+          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+          case 'application/vnd.oasis.opendocument.spreadsheet':
+            extractedText = await this.excelProcessService.process(attachment)
             break
         }
-
+        const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
+        if (savedFileUrl) fileUrl = savedFileUrl
         if (extractedText) processedContent += `\n\n${extractedText}`
       }
     }
@@ -62,13 +81,62 @@ export class MessageService {
       userId: dbUserId,
       isAi: false,
       messageType: 'user',
+      file_address: fileUrl,
+      file_name: attachments?.length ? attachments[0].filename : null,
     })
 
     try {
-      const context = await this.loadContext(roomId)
-      const aiResponse = await aiService.generateResponse(processedContent, context)
+      const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
+      const temperatureMap: Record<string, number> = {
+        text: process.env.MODEL_TEMPERATURE_TEXT
+          ? parseFloat(process.env.MODEL_TEMPERATURE_TEXT)
+          : 1.4,
+        pdf: process.env.MODEL_TEMPERATURE_PDF
+          ? parseFloat(process.env.MODEL_TEMPERATURE_PDF)
+          : 0.6,
+        word: process.env.MODEL_TEMPERATURE_WORD
+          ? parseFloat(process.env.MODEL_TEMPERATURE_WORD)
+          : 1.2,
+        excel: process.env.MODEL_TEMPERATURE_EXCEL
+          ? parseFloat(process.env.MODEL_TEMPERATURE_EXCEL)
+          : 0.6,
+      }
 
-      server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
+      const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
+      const aiResponse = await aiService.generateResponse(
+        combinedMessages,
+        temperature,
+        messageFlag,
+      )
+
+      let formattedResponse: string
+      let responseFileUrl: string | null = null
+
+      switch (messageFlag) {
+        case 'pdf':
+          responseFileUrl = await this.pdfResponseService.generate(aiResponse.content, roomId)
+          formattedResponse = aiResponse.content
+          break
+        case 'word':
+          responseFileUrl = await this.wordResponseService.generate(aiResponse.content, roomId)
+          formattedResponse = aiResponse.content
+          break
+        case 'excel':
+          responseFileUrl = await this.excelResponseService.generate(aiResponse.content, roomId)
+          formattedResponse = aiResponse.content
+          break
+        case 'text':
+        default:
+          formattedResponse = aiResponse.content
+          break
+      }
+
+      server.to(roomId).emit('message', {
+        userId: 'assistant',
+        message: formattedResponse,
+        fileUrl: responseFileUrl,
+        responseType: messageFlag,
+      })
 
       await this.messageRepository.save({
         text: aiResponse.content,
@@ -77,60 +145,14 @@ export class MessageService {
         userId: dbUserId,
         isAi: true,
         messageType: 'assistant',
+        file_address: responseFileUrl,
+        response_type: messageFlag,
       })
 
-      return { success: true }
+      return { success: true, responseType: messageFlag, fileUrl: responseFileUrl }
     } catch (error) {
-      server
-        .to(roomId)
-        .emit('message', { userId: 'system', message: `Ошибка AI API: ${error.message}` })
+      server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
       return { success: false, error: error.message }
     }
-  }
-
-  private async loadContext(
-    roomId: string,
-    limit: number = 50,
-  ): Promise<Array<{ role: string; content: string }>> {
-    const result = await this.messagesService.getMessagesByRoomId({
-      roomId,
-      limit,
-      offset: 0,
-    })
-
-    return result.data.reverse().map((msg) => ({
-      role: msg.messageType === 'user' ? 'user' : 'assistant',
-      content: msg.text,
-    }))
-  }
-
-  private async processPdf(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processPdf')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое PDF файла: ${attachment.filename}]`
-  }
-
-  private async processDoc(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processDoc')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое DOC файла: ${attachment.filename}]`
-  }
-
-  private async processDocx(attachment: FileAttachment): Promise<string> {
-    console.log('[MessageService] processDocx')
-    console.log('file:', attachment.filename)
-    console.log('size:', attachment.size)
-    console.log('type:', attachment.mimeType)
-    console.log('base64 length:', attachment.data?.length)
-
-    return `[Содержимое DOCX файла: ${attachment.filename}]`
   }
 }

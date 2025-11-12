@@ -7,7 +7,10 @@ import {
   deleteChat,
 } from '../../store/features/chat/chatSlice'
 import { useWebSocket } from '../../store/features/chat/useWebSocket'
-import { FileAttachment } from '../../store/features/chat/chatTypes'
+import {
+  FileAttachment,
+  MessageFlag,
+} from '../../store/features/chat/chatTypes'
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import Modal from './Modal'
@@ -34,6 +37,7 @@ const ChatLanding: React.FC = () => {
   const { chats, activeChat } = useSelector((state: RootState) => state.chat)
   const [inputValue, setInputValue] = useState('')
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
+  const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -65,7 +69,7 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
-  
+
   const handleLoginClick = () => {
     setModalOpen(true)
   }
@@ -81,11 +85,15 @@ const ChatLanding: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (messageFlag: MessageFlag) => {
     const currentChat = chats.find((chat) => chat.id === activeChat)
     const isWaitingForResponse = currentChat?.isWaitingForResponse || false
     if (!inputValue.trim() || !isConnected || isWaitingForResponse) return
-    sendMessage(inputValue, attachments.length > 0 ? attachments : undefined)
+    sendMessage(
+      inputValue,
+      messageFlag,
+      attachments.length > 0 ? attachments : undefined
+    )
     setInputValue('')
     setAttachments([])
   }

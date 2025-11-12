@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChatState, Chat, FileAttachment } from './chatTypes'
+import { ChatState, Chat, FileAttachment, MessageFlag } from './chatTypes'
 import { loadChats } from './loadChats'
+import {
+  fetchFileAsBase64,
+  getMimeTypeFromUrl,
+  getApiUrl,
+  getPresignedUrl,
+} from './utils'
 
 const initialState: ChatState = {
   chats: [],
@@ -18,6 +24,7 @@ const chatSlice = createSlice({
         content: string
         roomId: string
         attachments?: FileAttachment[]
+        messageFlag?: MessageFlag
       }>
     ) => {
       const messageId = `msg_${Date.now()}`
@@ -33,6 +40,7 @@ const chatSlice = createSlice({
             sender: 'user',
             status: 'sending',
             attachments: action.payload.attachments,
+            messageFlag: action.payload.messageFlag,
           },
         ],
       }
@@ -47,6 +55,7 @@ const chatSlice = createSlice({
         chatId: string
         content: string
         attachments?: FileAttachment[]
+        messageFlag?: MessageFlag
       }>
     ) => {
       const chat = state.chats.find((c) => c.id === action.payload.chatId)
@@ -59,13 +68,14 @@ const chatSlice = createSlice({
           sender: 'user',
           status: 'sending',
           attachments: action.payload.attachments,
+          messageFlag: action.payload.messageFlag,
         })
       }
     },
 
     addAssistantMessage: (
       state,
-      action: PayloadAction<{ content: string }>
+      action: PayloadAction<{ content: string; fileUrl?: string }>
     ) => {
       if (state.activeChat) {
         const chat = state.chats.find((c) => c.id === state.activeChat)
@@ -76,7 +86,27 @@ const chatSlice = createSlice({
             content: action.payload.content,
             sender: 'assistant',
             status: 'sent',
+            fileUrl: action.payload.fileUrl,
           })
+        }
+      }
+    },
+
+    addAttachmentToMessage: (
+      state,
+      action: PayloadAction<{
+        messageId: string
+        attachment: FileAttachment
+      }>
+    ) => {
+      for (const chat of state.chats) {
+        const message = chat.messages.find(
+          (m) => m.id === action.payload.messageId
+        )
+        if (message) {
+          if (!message.attachments) message.attachments = []
+          message.attachments.push(action.payload.attachment)
+          break
         }
       }
     },
@@ -133,6 +163,7 @@ export const {
   createChat,
   addMessage,
   addAssistantMessage,
+  addAttachmentToMessage,
   updateMessageStatus,
   setWaitingForResponse,
   setActiveChat,

@@ -1,9 +1,14 @@
+export type MessageFlag = 'text' | 'pdf' | 'word' | 'excel'
+
 export interface FileAttachment {
   filename: string
   mimeType:
     | 'application/pdf'
     | 'application/msword'
     | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    | 'application/vnd.ms-excel'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    | 'application/vnd.oasis.opendocument.spreadsheet'
   data: string
   size: number
 }
@@ -14,6 +19,8 @@ export interface Message {
   sender: 'user' | 'assistant'
   status?: 'sending' | 'sent' | 'error'
   attachments?: FileAttachment[]
+  messageFlag?: MessageFlag
+  fileUrl?: string
 }
 
 export interface Chat {

@@ -4,6 +4,8 @@ export interface SendMessagePayload {
   messageId?: string
   chatId?: string
   attachments?: FileAttachment[]
+  messageFlag?: 'text' | 'pdf' | 'word' | 'excel'
+  temperature?: number
 }
 
 export interface JoinRoomPayload {
@@ -21,6 +23,8 @@ export interface MessageEvent {
   message: string
   chatId?: string
   attachments?: FileAttachment[]
+  fileUrl?: string
+  responseType?: string
 }
 
 export interface JoinRoomResponse {
@@ -38,6 +42,8 @@ export interface SendMessageResponse {
   usage?: any
   error?: string
   details?: any
+  responseType?: string
+  fileUrl?: string
 }
 
 export interface FileAttachment {
@@ -46,6 +52,9 @@ export interface FileAttachment {
     | 'application/pdf'
     | 'application/msword'
     | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    | 'application/vnd.ms-excel'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    | 'application/vnd.oasis.opendocument.spreadsheet'
   data: string
   size: number
 }

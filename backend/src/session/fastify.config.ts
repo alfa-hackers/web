@@ -53,18 +53,12 @@ export function registerFastifyPlugins(app) {
     cookie: cookieConfig,
     store: redisStore,
   })
-
-  fastify.addHook('onRequest', async (req, res) => {
-    if (!req.cookies.user_temp_id) {
+  fastify.addHook('onRequest', async (req) => {
+    if (!req.session.user_temp_id) {
       const tempId = crypto.randomUUID()
 
-      res.setCookie('user_temp_id', tempId, {
-        path: '/',
-        httpOnly: false,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 365 * 24 * 60 * 60,
-      })
+      req.session.user_temp_id = tempId
+      await req.session.save()
     }
   })
 }

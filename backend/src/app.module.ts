@@ -6,6 +6,7 @@ import { DatabaseModule } from 'adapters/database.module'
 import { SocketModule } from 'socket/socket.module'
 import { MessagesModule } from 'controllers/messages/messages.module'
 import { RoomsModule } from 'controllers/rooms/rooms.module'
+import { MinioModule } from 'minio/minio.module'
 
 @Module({
   controllers: [],
@@ -22,7 +23,8 @@ import { RoomsModule } from 'controllers/rooms/rooms.module'
     DatabaseModule,
     SocketModule,
     MessagesModule,
-    RoomsModule
+    RoomsModule,
+    MinioModule,
   ],
 })
 export class AppModule {}

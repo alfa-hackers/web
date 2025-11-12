@@ -1,6 +1,9 @@
 import React from 'react'
-import { Chat } from '../../store/features/chat/chatTypes'
-import { FileAttachment } from '../../store/features/chat/chatTypes'
+import {
+  Chat,
+  FileAttachment,
+  MessageFlag,
+} from '../../store/features/chat/chatTypes'
 import WelcomeScreen from './WelcomeScreen'
 import MessagesList from './MessagesList'
 import InputArea from './InputArea'
@@ -11,7 +14,7 @@ interface MainViewportProps {
   isConnected: boolean
   inputValue: string
   setInputValue: (value: string) => void
-  onSendMessage: () => void
+  onSendMessage: (messageFlag: MessageFlag) => void
   messagesEndRef: React.RefObject<HTMLDivElement | null>
   attachments: FileAttachment[]
   onAttachmentsChange: (attachments: FileAttachment[]) => void

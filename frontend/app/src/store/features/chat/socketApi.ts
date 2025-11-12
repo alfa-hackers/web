@@ -1,11 +1,8 @@
 import { io, Socket } from 'socket.io-client'
 import { AppDispatch } from '../../store'
-import {
-  addAssistantMessage,
-  updateMessageStatus,
-  setWaitingForResponse,
-} from './chatSlice'
-import { FileAttachment } from './chatTypes'
+import { updateMessageStatus, setWaitingForResponse } from './chatSlice'
+import { FileAttachment, MessageFlag } from './chatTypes'
+import { processAssistantMessageWithFile } from './apiAiWithFileProcess'
 
 class SocketApi {
   private socket: Socket | null = null
@@ -33,9 +30,18 @@ class SocketApi {
 
     this.socket.on(
       'message',
-      (data: { userId: string; message: string; chatId?: string }) => {
+      (data: {
+        userId: string
+        message: string
+        chatId?: string
+        fileUrl?: string // Добавлено поле fileUrl
+      }) => {
         if (data.userId === 'assistant' && this.dispatch) {
-          this.dispatch(addAssistantMessage({ content: data.message }))
+          // Используем новый thunk для обработки сообщения с файлом
+          this.dispatch(
+            processAssistantMessageWithFile(data.message, data.fileUrl) as any
+          )
+
           if (data.chatId) {
             this.dispatch(
               setWaitingForResponse({ chatId: data.chatId, isWaiting: false })
@@ -95,6 +101,7 @@ class SocketApi {
     message: string,
     messageId: string,
     chatId: string,
+    messageFlag: MessageFlag,
     attachments?: FileAttachment[]
   ) {
     if (!this.socket?.connected) {
@@ -107,7 +114,7 @@ class SocketApi {
 
     this.socket.emit(
       'sendMessage',
-      { roomId, message, messageId, chatId, attachments },
+      { roomId, message, messageId, chatId, messageFlag, attachments },
       (response: any) => {
         if (this.dispatch) {
           this.dispatch(
