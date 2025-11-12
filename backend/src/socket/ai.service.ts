@@ -34,9 +34,9 @@ export class AIService {
         payload.push({
           role: 'system',
           content: `You are an AI that processes PDF documents.
-  Generate ONLY plain text summary from the PDF content.
-  Do NOT include explanations, comments, extra words, or formatting.
-  Output must be clean, readable text with no extra content.`,
+Generate ONLY plain text summary from the PDF content.
+Do NOT include explanations, comments, extra words, or formatting.
+Output must be clean, readable text with no extra content.`,
         })
         break
 
