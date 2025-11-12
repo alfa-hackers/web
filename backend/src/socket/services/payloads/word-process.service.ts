@@ -7,12 +7,8 @@ export class WordProcessService {
   async processDoc(attachment: FileAttachment): Promise<string> {
     try {
       const buffer = Buffer.from(attachment.data, 'base64')
-      const arrayBuffer = buffer.buffer.slice(
-        buffer.byteOffset,
-        buffer.byteOffset + buffer.byteLength,
-      )
 
-      const result = await mammoth.extractRawText({ arrayBuffer })
+      const result = await mammoth.extractRawText({ buffer })
 
       let output = `File: ${attachment.filename}\n\n`
       output += result.value.trim()
@@ -26,12 +22,8 @@ export class WordProcessService {
   async processDocx(attachment: FileAttachment): Promise<string> {
     try {
       const buffer = Buffer.from(attachment.data, 'base64')
-      const arrayBuffer = buffer.buffer.slice(
-        buffer.byteOffset,
-        buffer.byteOffset + buffer.byteLength,
-      )
 
-      const result = await mammoth.extractRawText({ arrayBuffer })
+      const result = await mammoth.extractRawText({ buffer })
 
       let output = `File: ${attachment.filename}\n\n`
       output += result.value.trim()

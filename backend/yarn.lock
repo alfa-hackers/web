@@ -2489,7 +2489,7 @@
     "@webassemblyjs/ast" "1.14.1"
     "@xtuc/long" "4.2.2"
 
-"@xmldom/xmldom@^0.8.6":
+"@xmldom/xmldom@^0.8.10", "@xmldom/xmldom@^0.8.6":
   version "0.8.11"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.11.tgz#b79de2d67389734c57c52595f7a7305e30c2d608"
   integrity sha512-cQzWCtO6C8TQiYl1ruKNn2U6Ao4o4WBBcbL61yJl84x+j5sOWWFU9X7DpND8XZG3daDppSsigMdfAIl2upQBRw==
@@ -7402,7 +7402,14 @@ pdf-parse@^2.4.5:
     "@napi-rs/canvas" "0.1.80"
     pdfjs-dist "5.4.296"
 
-pdfjs-dist@*:
+pdf2json@3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/pdf2json/-/pdf2json-3.1.4.tgz#d1bf8cb663bef9568bba3ad6d58b4e2b662c93b8"
+  integrity sha512-rS+VapXpXZr+5lUpHmRh3ugXdFXp24p1RyG24yP1DMpqP4t0mrYNGpLtpSbWD42PnQ59GIXofxF+yWb7M+3THg==
+  dependencies:
+    "@xmldom/xmldom" "^0.8.10"
+
+pdfjs-dist@*, pdfjs-dist@^5.4.394:
   version "5.4.394"
   resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-5.4.394.tgz#48697151afce097132673883a55bede103ded6e4"
   integrity sha512-9ariAYGqUJzx+V/1W4jHyiyCep6IZALmDzoaTLZ6VNu8q9LWi1/ukhzHgE2Xsx96AZi0mbZuK4/ttIbqSbLypg==
@@ -7426,6 +7433,13 @@ pdfkit@^0.17.2:
     jpeg-exif "^1.1.4"
     linebreak "^1.1.0"
     png-js "^1.0.0"
+
+pdfreader@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/pdfreader/-/pdfreader-3.0.8.tgz#1aff363517b1a292208898c93d970858f65a1f1c"
+  integrity sha512-95X/7bIYfetvu2J12i1MwPIqMo6niWn2fcZU64UJh7agV7/tKNOhp01z7WVAcblpY+bosvwIZG18Pku9VpMulQ==
+  dependencies:
+    pdf2json "3.1.4"
 
 pg-cloudflare@^1.2.7:
   version "1.2.7"
