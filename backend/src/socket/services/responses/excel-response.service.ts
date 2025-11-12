@@ -85,7 +85,7 @@ export class ExcelResponseService {
           })
         })
 
-        worksheet.columns.forEach((column, index) => {
+        worksheet.columns.forEach((column) => {
           let maxLength = 10
           column.eachCell({ includeEmpty: false }, (cell) => {
             const cellLength = cell.value ? cell.value.toString().length : 0

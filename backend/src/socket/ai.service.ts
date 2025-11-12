@@ -12,7 +12,10 @@ export interface AIResponse {
 export class AIService {
   constructor(private configService: ConfigService) {}
 
-  async generateResponse(messages: Array<{ role: string; content: string }>): Promise<AIResponse> {
+  async generateResponse(
+    messages: Array<{ role: string; content: string }>,
+    temperature: number = 0.7,
+  ): Promise<AIResponse> {
     const apiUrl =
       this.configService.get<string>('OPENAI_API_URL') ||
       'https://openrouter.ai/api/v1/chat/completions'
@@ -25,7 +28,7 @@ export class AIService {
     try {
       const response = await axios.post(
         apiUrl,
-        { model, messages: payload },
+        { model, messages: payload, temperature },
         {
           headers: {
             Authorization: `Bearer ${apiKey}`,

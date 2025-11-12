@@ -5,6 +5,7 @@ export interface SendMessagePayload {
   chatId?: string
   attachments?: FileAttachment[]
   messageFlag?: 'text' | 'pdf' | 'word' | 'excel'
+  temperature?: number
 }
 
 export interface JoinRoomPayload {

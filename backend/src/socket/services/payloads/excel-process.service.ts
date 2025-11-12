@@ -17,7 +17,7 @@ export class ExcelProcessService {
 
       let result = `File: ${attachment.filename}\n\n`
 
-      workbook.eachSheet((worksheet, sheetId) => {
+      workbook.eachSheet((worksheet) => {
         result += `Sheet: ${worksheet.name}\n`
         result += this.worksheetToCsv(worksheet)
         result += '\n'
@@ -33,11 +33,11 @@ export class ExcelProcessService {
     const rows: string[] = []
     let hasData = false
 
-    worksheet.eachRow((row, rowNumber) => {
+    worksheet.eachRow((row) => {
       const cells: string[] = []
       let rowHasData = false
 
-      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      row.eachCell({ includeEmpty: true }, (cell) => {
         const value = this.getCellValue(cell)
         cells.push(value)
         if (value) rowHasData = true

@@ -37,7 +37,7 @@ export class MessageService {
     server,
     aiService: AIService,
   ) {
-    const { roomId, message, attachments, messageFlag = 'text' } = payload
+    const { roomId, message, attachments, messageFlag = 'text', temperature: customTemp } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
     const { userTempId, dbUserId } = socket.data
 
@@ -87,7 +87,14 @@ export class MessageService {
 
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
-      const aiResponse = await aiService.generateResponse(combinedMessages)
+      const temperatureMap: Record<string, number> = {
+        text: 0.7,
+        pdf: 0.5,
+        word: 0.6,
+        excel: 1,
+      }
+      const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
+      const aiResponse = await aiService.generateResponse(combinedMessages, temperature)
 
       let formattedResponse: string
       let responseFileUrl: string | null = null
@@ -107,7 +114,7 @@ export class MessageService {
           break
         case 'text':
         default:
-          formattedResponse = ''
+          formattedResponse = aiResponse.content
           break
       }
 
