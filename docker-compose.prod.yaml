@@ -21,7 +21,6 @@ services:
     depends_on:
       - app
       - nestjs
-      - portainer
 
   app:
     build:
@@ -138,7 +137,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - app
+      - caddy
     restart: always
     logging:
       driver: 'json-file'
