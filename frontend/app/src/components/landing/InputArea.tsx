@@ -1,20 +1,20 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import '../../styles/landing/landing.scss'
 import {
   FileAttachment,
   MessageFlag,
 } from '../../store/features/chat/chatTypes'
-
-interface InputAreaProps {
-  inputValue: string
-  setInputValue: (value: string) => void
-  onSendMessage: (messageFlag: MessageFlag) => void
-  isConnected: boolean
-  isWaitingForResponse: boolean
-  hasMessages?: boolean
-  attachments: FileAttachment[]
-  onAttachmentsChange: (attachments: FileAttachment[]) => void
-}
+import {
+  BUTTON_ICONS,
+  FILE_ACCEPT_EXTENSIONS,
+  FORMAT_FLAGS,
+  MAX_FILE_SIZE,
+  PLACEHOLDERS,
+  TEXTAREA_MAX_HEIGHT,
+  TEXTAREA_MIN_HEIGHT,
+  ALLOWED_FILE_TYPES,
+  InputAreaProps,
+} from './consts'
 
 const InputArea: React.FC<InputAreaProps> = ({
   inputValue,
@@ -27,13 +27,52 @@ const InputArea: React.FC<InputAreaProps> = ({
   onAttachmentsChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    textarea.style.height = 'auto'
+    const newHeight = Math.max(
+      TEXTAREA_MIN_HEIGHT,
+      Math.min(textarea.scrollHeight, TEXTAREA_MAX_HEIGHT)
+    )
+    textarea.style.height = `${newHeight}px`
+  }
+
+  useEffect(() => {
+    adjustTextareaHeight()
+  }, [inputValue])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       onSendMessage(selectedFlag)
     }
+  }
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        resolve(result.split(',')[1])
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const validateFile = (file: File): string | null => {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      return `Файл ${file.name} имеет неподдерживаемый формат`
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return `Файл ${file.name} слишком большой (максимум 10 МБ)`
+    }
+    return null
   }
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,34 +83,14 @@ const InputArea: React.FC<InputAreaProps> = ({
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.oasis.opendocument.spreadsheet',
-      ]
+      const error = validateFile(file)
 
-      if (!allowedTypes.includes(file.type)) {
-        alert(`Файл ${file.name} имеет неподдерживаемый формат`)
+      if (error) {
+        alert(error)
         continue
       }
 
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`Файл ${file.name} слишком большой (максимум 10 МБ)`)
-        continue
-      }
-
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const result = reader.result as string
-          resolve(result.split(',')[1])
-        }
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
+      const base64 = await convertFileToBase64(file)
 
       newAttachments.push({
         filename: file.name,
@@ -82,6 +101,7 @@ const InputArea: React.FC<InputAreaProps> = ({
     }
 
     onAttachmentsChange([...attachments, ...newAttachments])
+
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -91,12 +111,20 @@ const InputArea: React.FC<InputAreaProps> = ({
     onAttachmentsChange(attachments.filter((_, i) => i !== index))
   }
 
-  const formatFlags: { value: MessageFlag; label: string; icon: string }[] = [
-    { value: 'text', label: 'Текст', icon: '📝' },
-    { value: 'pdf', label: 'PDF', icon: '📄' },
-    { value: 'word', label: 'Word', icon: '📘' },
-    { value: 'excel', label: 'Excel', icon: '📊' },
-  ]
+  const getPlaceholder = (): string => {
+    if (isWaitingForResponse) return PLACEHOLDERS.waiting
+    if (isConnected) return PLACEHOLDERS.connected
+    return PLACEHOLDERS.disconnected
+  }
+
+  const getSendButtonIcon = (): string => {
+    if (isWaitingForResponse) return BUTTON_ICONS.waiting
+    if (isConnected) return BUTTON_ICONS.connected
+    return BUTTON_ICONS.disconnected
+  }
+
+  const isInputDisabled = !isConnected || isWaitingForResponse
+  const isSendDisabled = !inputValue.trim() || isInputDisabled
 
   return (
     <div className={`input-area ${!hasMessages ? 'centered' : ''}`}>
@@ -104,7 +132,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         className={`status-panel 
           ${isConnected ? 'connected' : 'disconnected'} 
           ${!hasMessages ? 'centered' : ''}`}
-      ></div>
+      />
 
       {attachments.length > 0 && (
         <div className="attachments-preview">
@@ -116,23 +144,22 @@ const InputArea: React.FC<InputAreaProps> = ({
                 onClick={() => removeAttachment(index)}
                 type="button"
               >
-                ✕
+                {BUTTON_ICONS.remove}
               </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Format selector */}
       <div className="format-selector">
         <span className="format-label">Формат ответа:</span>
         <div className="format-options">
-          {formatFlags.map((flag) => (
+          {FORMAT_FLAGS.map((flag) => (
             <button
               key={flag.value}
               className={`format-badge ${selectedFlag === flag.value ? 'active' : ''}`}
               onClick={() => setSelectedFlag(flag.value)}
-              disabled={!isConnected || isWaitingForResponse}
+              disabled={isInputDisabled}
               type="button"
               title={flag.label}
             >
@@ -147,42 +174,38 @@ const InputArea: React.FC<InputAreaProps> = ({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx"
+          accept={FILE_ACCEPT_EXTENSIONS}
           multiple
           style={{ display: 'none' }}
           onChange={handleFileSelect}
-          disabled={!isConnected || isWaitingForResponse}
+          disabled={isInputDisabled}
         />
 
         <button
           className="attach-button"
           onClick={() => fileInputRef.current?.click()}
-          disabled={!isConnected || isWaitingForResponse}
+          disabled={isInputDisabled}
           type="button"
         >
-          📎
+          {BUTTON_ICONS.attach}
         </button>
 
         <textarea
+          ref={textareaRef}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyUp={handleKeyPress}
-          placeholder={
-            isWaitingForResponse
-              ? 'Ожидание ответа...'
-              : isConnected
-                ? 'Задайте вопрос...'
-                : 'Ожидание подключения...'
-          }
+          placeholder={getPlaceholder()}
           rows={1}
-          disabled={!isConnected || isWaitingForResponse}
+          disabled={isInputDisabled}
+          style={{ resize: 'none', overflow: 'hidden' }}
         />
 
         <button
           onClick={() => onSendMessage(selectedFlag)}
-          disabled={!inputValue.trim() || !isConnected || isWaitingForResponse}
+          disabled={isSendDisabled}
         >
-          {isWaitingForResponse ? '⏳' : isConnected ? '↑' : '⌛'}
+          {getSendButtonIcon()}
         </button>
       </div>
     </div>

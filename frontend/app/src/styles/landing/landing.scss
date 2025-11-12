@@ -18,8 +18,8 @@
   padding: 12px;
   justify-content: flex-end;
   gap: 10px;
-  position: absolute; /* Positions this container absolutely */
-  top: 12px; /* Distance from the top */
+  position: absolute;
+  top: 12px;
   right: 12px;
 }
 
@@ -104,8 +104,8 @@
 
   .format-options {
     display: flex;
-    flex-flow: row wrap; /* <-- делает кнопки в одну строку */ /* можно убрать, если не нужно переносить */
-    gap: 8px; /* отступы между кнопками */
+    flex-flow: row wrap;
+    gap: 8px;
   }
 
   .format-badge {
