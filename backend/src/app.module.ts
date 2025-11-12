@@ -23,12 +23,8 @@ import { MinioModule } from 'minio/minio.module'
     DatabaseModule,
     SocketModule,
     MessagesModule,
-<<<<<<< HEAD
     RoomsModule,
     MinioModule,
-=======
-    RoomsModule
->>>>>>> 64aa15d (fix: changed API for easier work)
   ],
 })
 export class AppModule {}
