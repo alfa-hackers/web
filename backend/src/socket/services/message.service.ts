@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Message } from 'src/domain/message.entity'
+import { Message } from 'domain/message.entity'
 import { ClientManagerService } from '../client-manager.service'
 import { AIService } from '../ai.service'
 import { SendMessagePayload, FileAttachment } from '../socket.interface'
-import { MessagesService } from 'src/all_messages/services/messages.service'
+import { MessagesService } from 'controllers/messages/services/messages.service'
 
 @Injectable()
 export class MessageService {
