@@ -1,3 +1,5 @@
+export type MessageFlag = 'text' | 'pdf' | 'word' | 'excel'
+
 export interface FileAttachment {
   filename: string
   mimeType:
@@ -17,6 +19,8 @@ export interface Message {
   sender: 'user' | 'assistant'
   status?: 'sending' | 'sent' | 'error'
   attachments?: FileAttachment[]
+  messageFlag?: MessageFlag
+  fileUrl?: string
 }
 
 export interface Chat {

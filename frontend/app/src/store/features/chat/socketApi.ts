@@ -5,7 +5,7 @@ import {
   updateMessageStatus,
   setWaitingForResponse,
 } from './chatSlice'
-import { FileAttachment } from './chatTypes'
+import { FileAttachment, MessageFlag } from './chatTypes'
 
 class SocketApi {
   private socket: Socket | null = null
@@ -95,6 +95,7 @@ class SocketApi {
     message: string,
     messageId: string,
     chatId: string,
+    messageFlag: MessageFlag,
     attachments?: FileAttachment[]
   ) {
     if (!this.socket?.connected) {
@@ -107,7 +108,7 @@ class SocketApi {
 
     this.socket.emit(
       'sendMessage',
-      { roomId, message, messageId, chatId, attachments },
+      { roomId, message, messageId, chatId, messageFlag, attachments },
       (response: any) => {
         if (this.dispatch) {
           this.dispatch(

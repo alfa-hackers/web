@@ -4,6 +4,7 @@ export interface SendMessagePayload {
   messageId?: string
   chatId?: string
   attachments?: FileAttachment[]
+  messageFlag?: 'text' | 'pdf' | 'word' | 'excel'
 }
 
 export interface JoinRoomPayload {
@@ -21,6 +22,8 @@ export interface MessageEvent {
   message: string
   chatId?: string
   attachments?: FileAttachment[]
+  fileUrl?: string
+  responseType?: string
 }
 
 export interface JoinRoomResponse {
@@ -38,6 +41,8 @@ export interface SendMessageResponse {
   usage?: any
   error?: string
   details?: any
+  responseType?: string
+  fileUrl?: string
 }
 
 export interface FileAttachment {

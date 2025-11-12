@@ -1,11 +1,14 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import '../../styles/landing/landing.scss'
-import { FileAttachment } from '../../store/features/chat/chatTypes'
+import {
+  FileAttachment,
+  MessageFlag,
+} from '../../store/features/chat/chatTypes'
 
 interface InputAreaProps {
   inputValue: string
   setInputValue: (value: string) => void
-  onSendMessage: () => void
+  onSendMessage: (messageFlag: MessageFlag) => void
   isConnected: boolean
   isWaitingForResponse: boolean
   hasMessages?: boolean
@@ -24,11 +27,12 @@ const InputArea: React.FC<InputAreaProps> = ({
   onAttachmentsChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      onSendMessage()
+      onSendMessage(selectedFlag)
     }
   }
 
@@ -84,6 +88,13 @@ const InputArea: React.FC<InputAreaProps> = ({
     onAttachmentsChange(attachments.filter((_, i) => i !== index))
   }
 
+  const formatFlags: { value: MessageFlag; label: string; icon: string }[] = [
+    { value: 'text', label: 'Текст', icon: '📝' },
+    { value: 'pdf', label: 'PDF', icon: '📄' },
+    { value: 'word', label: 'Word', icon: '📘' },
+    { value: 'excel', label: 'Excel', icon: '📊' },
+  ]
+
   return (
     <div className={`input-area ${!hasMessages ? 'centered' : ''}`}>
       <div
@@ -108,6 +119,26 @@ const InputArea: React.FC<InputAreaProps> = ({
           ))}
         </div>
       )}
+
+      {/* Format selector */}
+      <div className="format-selector">
+        <span className="format-label">Формат ответа:</span>
+        <div className="format-options">
+          {formatFlags.map((flag) => (
+            <button
+              key={flag.value}
+              className={`format-badge ${selectedFlag === flag.value ? 'active' : ''}`}
+              onClick={() => setSelectedFlag(flag.value)}
+              disabled={!isConnected || isWaitingForResponse}
+              type="button"
+              title={flag.label}
+            >
+              <span className="format-icon">{flag.icon}</span>
+              <span className="format-text">{flag.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="input-wrapper">
         <input
@@ -145,7 +176,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         />
 
         <button
-          onClick={onSendMessage}
+          onClick={() => onSendMessage(selectedFlag)}
           disabled={!inputValue.trim() || !isConnected || isWaitingForResponse}
         >
           {isWaitingForResponse ? '⏳' : isConnected ? '↑' : '⌛'}

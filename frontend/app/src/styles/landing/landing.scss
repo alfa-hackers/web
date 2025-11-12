@@ -1,7 +1,7 @@
-@import '../Global/variables.scss';
-@import '../Media/mobile.scss';
-@import './sidebar.scss';
-@import './viewport.scss';
+@import '../Global/variables';
+@import '../Media/mobile';
+@import './sidebar';
+@import './viewport';
 
 .chat-landing {
   display: flex;
@@ -26,7 +26,6 @@
 .header-actions.reversed {
   justify-content: flex-start; /* Aligns buttons to the left if the class 'reversed' is added */
 }
-
 
 .login-btn {
   display: flex;
@@ -60,7 +59,7 @@
     color: $color-accent;
   }
 
-  input[type="file"] {
+  input[type='file'] {
     display: none;
   }
 }
@@ -71,7 +70,6 @@
   gap: 10px;
 }
 
-
 .typing-indicator {
   display: flex;
   gap: 4px;
@@ -81,7 +79,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgb(255, 255, 255, 0.5);
     animation: typing 1.4s ease-in-out infinite;
 
     &:nth-child(2) {
@@ -90,6 +88,41 @@
 
     &:nth-child(3) {
       animation-delay: 0.4s;
+    }
+  }
+}
+
+.format-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .format-label {
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+
+  .format-options {
+    display: flex;
+    flex-flow: row wrap; /* <-- делает кнопки в одну строку */ /* можно убрать, если не нужно переносить */
+    gap: 8px; /* отступы между кнопками */
+  }
+
+  .format-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f6f6f6;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
     }
   }
 }

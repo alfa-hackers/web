@@ -25,7 +25,7 @@ export class MessageService {
     server,
     aiService: AIService,
   ) {
-    const { roomId, message, attachments } = payload
+    const { roomId, message, attachments, messageFlag = 'text' } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
     const { userTempId, dbUserId } = socket.data
 
@@ -38,7 +38,6 @@ export class MessageService {
     if (attachments?.length) {
       for (const attachment of attachments) {
         let extractedText = ''
-
         switch (attachment.mimeType) {
           case 'application/pdf':
             extractedText = await this.processPdf(attachment)
@@ -55,10 +54,8 @@ export class MessageService {
             extractedText = await this.processExcel(attachment)
             break
         }
-
         const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
         if (savedFileUrl) fileUrl = savedFileUrl
-
         if (extractedText) processedContent += `\n\n${extractedText}`
       }
     }
@@ -79,7 +76,35 @@ export class MessageService {
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
       const aiResponse = await aiService.generateResponse(combinedMessages)
-      server.to(roomId).emit('message', { userId: 'assistant', message: aiResponse.content })
+
+      let formattedResponse: string
+      let responseFileUrl: string | null = null
+
+      switch (messageFlag) {
+        case 'pdf':
+          formattedResponse = await this.responsePdf(aiResponse.content, roomId)
+          responseFileUrl = formattedResponse
+          break
+        case 'word':
+          formattedResponse = await this.responseWord(aiResponse.content, roomId)
+          responseFileUrl = formattedResponse
+          break
+        case 'excel':
+          formattedResponse = await this.responseExcel(aiResponse.content, roomId)
+          responseFileUrl = formattedResponse
+          break
+        case 'text':
+        default:
+          formattedResponse = await this.responseText(aiResponse.content)
+          break
+      }
+
+      server.to(roomId).emit('message', {
+        userId: 'assistant',
+        message: formattedResponse,
+        fileUrl: responseFileUrl,
+        responseType: messageFlag,
+      })
 
       await this.messageRepository.save({
         text: aiResponse.content,
@@ -88,9 +113,11 @@ export class MessageService {
         userId: dbUserId,
         isAi: true,
         messageType: 'assistant',
+        file_address: responseFileUrl,
+        response_type: messageFlag,
       })
 
-      return { success: true }
+      return { success: true, responseType: messageFlag, fileUrl: responseFileUrl }
     } catch (error) {
       server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
       return { success: false, error: error.message }
@@ -111,5 +138,118 @@ export class MessageService {
 
   private async processExcel(attachment: FileAttachment): Promise<string> {
     return `[Excel content: ${attachment.filename}]`
+  }
+
+  private async responseText(content: string): Promise<string> {
+    console.log(`[${new Date().toISOString()}] [MessageService] responseText() called`)
+    console.log(`[${new Date().toISOString()}] [MessageService] responseText() called`)
+    return content
+  }
+
+  private async responsePdf(content: string, roomId: string): Promise<string> {
+    console.log(`[${new Date().toISOString()}] [MessageService] responsePdf() called`)
+    console.log(`[${new Date().toISOString()}] [MessageService] responsePdf() called`)
+    console.log(`[${new Date().toISOString()}] [MessageService] responsePdf() called`)
+    try {
+      const PDFDocument = require('pdfkit')
+      const fs = require('fs')
+      const path = require('path')
+      const filename = `response_${Date.now()}.pdf`
+      const tempPath = path.join('/tmp', filename)
+      const doc = new PDFDocument()
+      const stream = fs.createWriteStream(tempPath)
+      doc.pipe(stream)
+      doc.fontSize(12).text(content, 100, 100)
+      doc.end()
+      await new Promise((resolve) => stream.on('finish', resolve))
+      const fileBuffer = fs.readFileSync(tempPath)
+      const base64Data = fileBuffer.toString('base64')
+      const fileUrl = await this.saveMinioService.saveFile(
+        {
+          filename,
+          mimeType: 'application/pdf',
+          data: base64Data,
+          size: fileBuffer.length,
+        },
+        roomId,
+      )
+      fs.unlinkSync(tempPath)
+      return fileUrl
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      return content
+    }
+  }
+
+  private async responseWord(content: string, roomId: string): Promise<string> {
+    console.log(`[${new Date().toISOString()}] [MessageService] responseWord() called`)
+    console.log(`[${new Date().toISOString()}] [MessageService] responseWord() called`)
+    console.log(`[${new Date().toISOString()}] [MessageService] responseWord() called`)
+    try {
+      const { Document, Packer, Paragraph, TextRun } = require('docx')
+      const fs = require('fs')
+      const path = require('path')
+      const filename = `response_${Date.now()}.docx`
+      const tempPath = path.join('/tmp', filename)
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [new Paragraph({ children: [new TextRun(content)] })],
+          },
+        ],
+      })
+      const buffer = await Packer.toBuffer(doc)
+      fs.writeFileSync(tempPath, buffer)
+      const base64Data = buffer.toString('base64')
+      const fileUrl = await this.saveMinioService.saveFile(
+        {
+          filename,
+          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          data: base64Data,
+          size: buffer.length,
+        },
+        roomId,
+      )
+      fs.unlinkSync(tempPath)
+      return fileUrl
+    } catch (error) {
+      console.error('Error generating Word document:', error)
+      return content
+    }
+  }
+
+  private async responseExcel(content: string, roomId: string): Promise<string> {
+    try {
+      const ExcelJS = require('exceljs')
+      const fs = require('fs')
+      const path = require('path')
+      const filename = `response_${Date.now()}.xlsx`
+      const tempPath = path.join('/tmp', filename)
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet('AI Response')
+      const lines = content.split('\n')
+      lines.forEach((line, index) => {
+        worksheet.getCell(`A${index + 1}`).value = line
+      })
+      worksheet.columns = [{ width: 80 }]
+      await workbook.xlsx.writeFile(tempPath)
+      const fileBuffer = fs.readFileSync(tempPath)
+      const base64Data = fileBuffer.toString('base64')
+      const fileUrl = await this.saveMinioService.saveFile(
+        {
+          filename,
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          data: base64Data,
+          size: fileBuffer.length,
+        },
+        roomId,
+      )
+      fs.unlinkSync(tempPath)
+      return fileUrl
+    } catch (error) {
+      console.error('Error generating Excel:', error)
+      return content
+    }
   }
 }

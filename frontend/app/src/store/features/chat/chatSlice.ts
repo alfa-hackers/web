@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChatState, Chat, FileAttachment } from './chatTypes'
+import { ChatState, Chat, FileAttachment, MessageFlag } from './chatTypes'
 import { loadChats } from './loadChats'
 
 const initialState: ChatState = {
@@ -18,6 +18,7 @@ const chatSlice = createSlice({
         content: string
         roomId: string
         attachments?: FileAttachment[]
+        messageFlag?: MessageFlag
       }>
     ) => {
       const messageId = `msg_${Date.now()}`
@@ -33,6 +34,7 @@ const chatSlice = createSlice({
             sender: 'user',
             status: 'sending',
             attachments: action.payload.attachments,
+            messageFlag: action.payload.messageFlag,
           },
         ],
       }
@@ -47,6 +49,7 @@ const chatSlice = createSlice({
         chatId: string
         content: string
         attachments?: FileAttachment[]
+        messageFlag?: MessageFlag
       }>
     ) => {
       const chat = state.chats.find((c) => c.id === action.payload.chatId)
@@ -59,13 +62,14 @@ const chatSlice = createSlice({
           sender: 'user',
           status: 'sending',
           attachments: action.payload.attachments,
+          messageFlag: action.payload.messageFlag,
         })
       }
     },
 
     addAssistantMessage: (
       state,
-      action: PayloadAction<{ content: string }>
+      action: PayloadAction<{ content: string; fileUrl?: string }>
     ) => {
       if (state.activeChat) {
         const chat = state.chats.find((c) => c.id === state.activeChat)
@@ -76,6 +80,7 @@ const chatSlice = createSlice({
             content: action.payload.content,
             sender: 'assistant',
             status: 'sent',
+            fileUrl: action.payload.fileUrl,
           })
         }
       }
