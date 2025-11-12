@@ -4,7 +4,11 @@ import { Repository } from 'typeorm'
 import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { User } from 'domain/user.entity'
+<<<<<<< HEAD
 import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
+=======
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from 'controllers/messages/dto/messages.dto'
+>>>>>>> cc761e0 (chore: renamed all modules paths)
 
 @Injectable()
 export class MessagesService {

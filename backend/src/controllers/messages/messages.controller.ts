@@ -1,6 +1,10 @@
 import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
 import { MessagesService } from 'controllers/messages/services/messages.service'
+<<<<<<< HEAD
 import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
+=======
+import { GetMessagesQueryDto, GetRoomMessagesDto, GetUserRoomsQueryDto } from 'controllers/messages/dto/messages.dto'
+>>>>>>> cc761e0 (chore: renamed all modules paths)
 import { ApiBody } from '@nestjs/swagger'
 
 @Controller('messages')
