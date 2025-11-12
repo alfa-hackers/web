@@ -102,15 +102,15 @@ export class MessageService {
       switch (messageFlag) {
         case 'pdf':
           responseFileUrl = await this.pdfResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = ''
+          formattedResponse = aiResponse.content
           break
         case 'word':
           responseFileUrl = await this.wordResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = ''
+          formattedResponse = aiResponse.content
           break
         case 'excel':
           responseFileUrl = await this.excelResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = ''
+          formattedResponse = aiResponse.content
           break
         case 'text':
         default:
