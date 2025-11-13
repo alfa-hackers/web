@@ -329,12 +329,15 @@
       border: none;
       padding: 14px 16px;
       color: $color-text;
-      font-size: clamp(0.8rem, 0.6vw, 1rem);
+      font-size: clamp(1rem, 0.6vw, 1.2rem);
       font-family: inherit;
       resize: none;
       outline: none;
       max-height: 200px;
       min-height: 52px;
+
+      overflow-y: auto;
+      overflow-x: hidden;
 
       &::placeholder {
         color: $color-text-light;
