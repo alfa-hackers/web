@@ -5,7 +5,7 @@ import '../../styles/landing/modal.scss'
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess?: () => void // вызывается после успешного входа
+  onSuccess?: () => void
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
