@@ -30,24 +30,29 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   return (
-  <div className="modal-overlay" onClick={onClose}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <div className="modal-header">
-        <h2>Вход</h2>
+  <div className="modal-overlay">
+    <div className="btn-container">
+      <button className="modal-btn-exit" onClick={onClose}>
+        ✕
+      </button>
+    </div>
+    <div className="modal-content-wrapper">
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Вход</h2>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input type="text" id="username" placeholder="Введите вашего пользователя" required />
+          </div>
+          <div className="form-group">
+            <input type="password" id="password" placeholder="Введите ваш пароль" required />
+          </div>
+          <button type="submit" className="submit-btn">
+            Войти
+          </button>
+        </form>
       </div>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Пользователь</label>
-          <input type="text" id="username" placeholder="Введите вашего пользователя" required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Пароль</label>
-          <input type="password" id="password" placeholder="Введите ваш пароль" required />
-        </div>
-        <button type="submit" className="submit-btn">
-          Войти
-        </button>
-      </form>
     </div>
   </div>
 )

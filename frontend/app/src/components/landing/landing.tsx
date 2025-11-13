@@ -14,7 +14,8 @@ import {
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import Modal from './Modal'
-import '../../styles/landing/landing.scss'
+import '@/styles/landing/landing.scss'
+import '@/styles/Media/mobile.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
 
 const getCookie = (name: string): string | null => {
