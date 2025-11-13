@@ -94,27 +94,32 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
     onClose()
   }
 
+  const isFormFilled = () => {
+    return (
+      formData.username.trim().length > 0 &&
+      formData.email.trim().length > 0 &&
+      formData.password.trim().length > 0
+    )
+  }
+
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay">
+      <div className="btn-container">
+       <button className="modal-btn-exit" onClick={handleClose}>
+         ✕
+       </button>
+     </div>
+     <div className="modal-content-wrapper">
+
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Регистрация</h2>
-          <button
-            className="close-btn"
-            onClick={handleClose}
-            aria-label="Close"
-          >
-            ×
-          </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">
-              Пользователь <span className="required">*</span>
-            </label>
             <input
               type="text"
               id="username"
@@ -132,9 +137,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">
-              Email <span className="optional">(необязательно)</span>
-            </label>
             <input
               type="email"
               id="email"
@@ -151,9 +153,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">
-              Пароль <span className="required">*</span>
-            </label>
             <input
               type="password"
               id="password"
@@ -172,17 +171,12 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
           {error && <div className="error-banner">{error}</div>}
 
-          <button type="submit" className="submit-btn" disabled={isLoading}>
+          <button type="submit" className={`submit-btn ${isFormFilled() ? 'filled' : ''}`} disabled={isLoading}>
             {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
         </form>
-
-        <div className="modal-footer">
-          <p>
-            Уже есть аккаунт? <a href="/login">Войти</a>
-          </p>
-        </div>
       </div>
+     </div>
     </div>
   )
 }

@@ -6,39 +6,44 @@ interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess?: () => void
+  onOpenRegister?: () => void
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  onOpenRegister,
 }) => {
   const { login, isLoading, error, clearError } = useAuth()
 
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
   })
 
   const [validationErrors, setValidationErrors] = useState({
-    username: '',
     email: '',
     password: '',
   })
 
   const validateForm = () => {
-    const errors = { username: '', email: '', password: '' }
+    const errors = { email: '', password: '' }
 
-    if (!formData.username.trim()) errors.username = 'Username cannot be empty'
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      errors.email = 'Invalid email format'
-    if (!formData.password) errors.password = 'Password cannot be empty'
-    else if (formData.password.length < 6)
-      errors.password = 'Password must be at least 6 characters'
+    if (!formData.email.trim()) {
+      errors.email = 'Введите email'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Неверный формат email'
+    }
+
+    if (!formData.password) {
+      errors.password = 'Пароль не может быть пустым'
+    } else if (formData.password.length < 6) {
+      errors.password = 'Пароль должен быть не меньше 6 символов'
+    }
 
     setValidationErrors(errors)
-    return !errors.username && !errors.email && !errors.password
+    return !errors.email && !errors.password
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,20 +55,17 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (!validateForm()) return
 
     const success = await login({
-      username: formData.username,
-      email: formData.email || undefined,
+      email: formData.email,
       password: formData.password,
     })
 
     if (success) {
-      // сброс формы
-      setFormData({ username: '', email: '', password: '' })
-      setValidationErrors({ username: '', email: '', password: '' })
-
-      // ✅ вызываем коллбек onSuccess после успешного логина
+      setFormData({ email: '', password: '' })
+      setValidationErrors({ email: '', password: '' })
       if (onSuccess) {
         onSuccess()
       } else {
@@ -73,99 +75,94 @@ const LoginModal: React.FC<LoginModalProps> = ({
   }
 
   const handleClose = () => {
-    setFormData({ username: '', email: '', password: '' })
-    setValidationErrors({ username: '', email: '', password: '' })
+    setFormData({ email: '', password: '' })
+    setValidationErrors({ email: '', password: '' })
     clearError()
     onClose()
   }
+
+  const isFormFilled = () =>
+    formData.email.trim().length > 0 && formData.password.trim().length > 0
 
   if (!isOpen) return null
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Вход</h2>
-          <button
-            className="close-btn"
-            onClick={handleClose}
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">
-              Пользователь <span className="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Введите имя пользователя"
-              className={validationErrors.username ? 'error' : ''}
-              disabled={isLoading}
-              required
-            />
-            {validationErrors.username && (
-              <span className="error-message">{validationErrors.username}</span>
-            )}
+      <div className="btn-container">
+        <button className="modal-btn-exit" onClick={handleClose}>
+          ✕
+        </button>
+      </div>
+      <div
+        className="modal-content-wrapper"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-content">
+          <div className="modal-header">
+            <h2>Вход</h2>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">
-              Email <span className="optional">(необязательно)</span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Введите ваш email"
-              className={validationErrors.email ? 'error' : ''}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                className={validationErrors.email ? 'error' : ''}
+                disabled={isLoading}
+                autoComplete="email"
+              />
+              {validationErrors.email && (
+                <span className="error-message">{validationErrors.email}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Пароль"
+                className={validationErrors.password ? 'error' : ''}
+                disabled={isLoading}
+                autoComplete="current-password"
+              />
+              {validationErrors.password && (
+                <span className="error-message">
+                  {validationErrors.password}
+                </span>
+              )}
+            </div>
+
+            {error && <div className="error-banner">{error}</div>}
+
+            <button
+              type="submit"
+              className={`submit-btn ${isFormFilled() ? 'filled' : ''}`}
               disabled={isLoading}
-            />
-            {validationErrors.email && (
-              <span className="error-message">{validationErrors.email}</span>
-            )}
+            >
+              {isLoading ? 'Вход...' : 'Войти'}
+            </button>
+          </form>
+
+          <div className="modal-footer">
+            <p>
+              Нет аккаунта?{' '}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  handleClose()
+                  if (onOpenRegister) onOpenRegister()
+                }}
+              >
+                <u>Зарегистрироваться</u>
+              </button>
+            </p>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">
-              Пароль <span className="required">*</span>
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Введите ваш пароль"
-              className={validationErrors.password ? 'error' : ''}
-              disabled={isLoading}
-              required
-            />
-            {validationErrors.password && (
-              <span className="error-message">{validationErrors.password}</span>
-            )}
-          </div>
-
-          {error && <div className="error-banner">{error}</div>}
-
-          <button type="submit" className="submit-btn" disabled={isLoading}>
-            {isLoading ? 'Вход...' : 'Войти'}
-          </button>
-        </form>
-
-        <div className="modal-footer">
-          <p>
-            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
-          </p>
         </div>
       </div>
     </div>
