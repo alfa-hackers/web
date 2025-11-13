@@ -19,5 +19,5 @@ export const frequencyPenaltyMap: Record<string, number> = {
     : 0,
   business: process.env.MODEL_FREQUENCY_PENALTY_BUSINESS
     ? parseFloat(process.env.MODEL_FREQUENCY_PENALTY_BUSINESS)
-    : 0,
+    : 0.3,
 }

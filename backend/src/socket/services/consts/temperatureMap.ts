@@ -13,5 +13,5 @@ export const temperatureMap: Record<string, number> = {
     : 0.8,
   business: process.env.MODEL_TEMPERATURE_BUSINESS
     ? parseFloat(process.env.MODEL_TEMPERATURE_BUSINESS)
-    : 1.5,
+    : 0.3,
 }

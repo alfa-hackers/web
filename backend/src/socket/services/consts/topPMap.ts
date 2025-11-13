@@ -7,5 +7,5 @@ export const topPMap: Record<string, number> = {
     ? parseFloat(process.env.MODEL_TOP_P_POWERPOINT)
     : 1,
   checklist: process.env.MODEL_TOP_P_CHECKLIST ? parseFloat(process.env.MODEL_TOP_P_CHECKLIST) : 1,
-  business: process.env.MODEL_TOP_P_BUSINESS ? parseFloat(process.env.MODEL_TOP_P_BUSINESS) : 1,
+  business: process.env.MODEL_TOP_P_BUSINESS ? parseFloat(process.env.MODEL_TOP_P_BUSINESS) : 0.85,
 }
