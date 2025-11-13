@@ -23,6 +23,7 @@ import { RoomConnectionService } from './services/room/room-connection.service'
 import { AuthModule } from 'controllers/auth/auth.module'
 import { PowerpointResponseService } from './services/responses/powerpoint-reponse.service'
 import { ChecklistResponseService } from './services/responses/checklist-response.service'
+import { PowerPointProcessService } from './services/payloads/powerpoint-process.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
@@ -45,6 +46,7 @@ import { ChecklistResponseService } from './services/responses/checklist-respons
     RoomConnectionService,
     PowerpointResponseService,
     ChecklistResponseService,
+    PowerPointProcessService,
   ],
   exports: [ClientManagerService],
 })

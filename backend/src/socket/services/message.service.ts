@@ -16,6 +16,7 @@ import { ChecklistResponseService } from './responses/checklist-response.service
 import { PdfProcessService } from './payloads/pdf-process.service'
 import { WordProcessService } from './payloads/word-process.service'
 import { ExcelProcessService } from './payloads/excel-process.service'
+import { PowerPointProcessService } from './payloads/powerpoint-process.service'
 
 @Injectable()
 export class MessageService {
@@ -32,6 +33,7 @@ export class MessageService {
     private readonly pdfProcessService: PdfProcessService,
     private readonly wordProcessService: WordProcessService,
     private readonly excelProcessService: ExcelProcessService,
+    private readonly powerpointProcessService: PowerPointProcessService,
   ) {}
 
   async handleMessage(
@@ -69,6 +71,12 @@ export class MessageService {
           case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
           case 'application/vnd.oasis.opendocument.spreadsheet':
             extractedText = await this.excelProcessService.process(attachment)
+            break
+          case 'application/vnd.ms-powerpoint':
+            extractedText = await this.powerpointProcessService.processPpt(attachment)
+            break
+          case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+            extractedText = await this.powerpointProcessService.processPptx(attachment)
             break
         }
 
