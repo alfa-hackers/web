@@ -3,15 +3,17 @@ import { useAuth } from '@/store/features/auth/useAuth'
 import '../../styles/landing/modal.scss'
 
 interface LoginModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  onOpenRegister?: () => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  onOpenRegister,
 }) => {
   const { login, isLoading, error, clearError } = useAuth()
 
@@ -79,47 +81,31 @@ const LoginModal: React.FC<LoginModalProps> = ({
     onClose()
   }
 
+  const isFormFilled = () => {
+    return (
+      formData.email.trim().length > 0 &&
+      formData.password.trim().length > 0
+    )
+  }
+
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay">
+      <div className="btn-container">
+       <button className="modal-btn-exit" onClick={onClose}>
+         ✕
+       </button>
+     </div>
+     <div className="modal-content-wrapper">
+
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Вход</h2>
-          <button
-            className="close-btn"
-            onClick={handleClose}
-            aria-label="Close"
-          >
-            ×
-          </button>
         </div>
-
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">
-              Пользователь <span className="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Введите имя пользователя"
-              className={validationErrors.username ? 'error' : ''}
-              disabled={isLoading}
-              required
-            />
-            {validationErrors.username && (
-              <span className="error-message">{validationErrors.username}</span>
-            )}
-          </div>
 
           <div className="form-group">
-            <label htmlFor="email">
-              Email <span className="optional">(необязательно)</span>
-            </label>
             <input
               type="email"
               id="email"
@@ -136,9 +122,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">
-              Пароль <span className="required">*</span>
-            </label>
             <input
               type="password"
               id="password"
@@ -157,17 +140,32 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
           {error && <div className="error-banner">{error}</div>}
 
-          <button type="submit" className="submit-btn" disabled={isLoading}>
+          <button type="submit" className={`submit-btn ${isFormFilled() ? 'filled' : ''}`} disabled={isLoading}>
             {isLoading ? 'Вход...' : 'Войти'}
           </button>
         </form>
 
         <div className="modal-footer">
-          <p>
-            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
-          </p>
-        </div>
+            <p>
+              Нет аккаунта?{' '}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  onClose()
+                  if (onOpenRegister) {
+                    onOpenRegister();
+                  }
+                }}
+              >
+                <u>
+                  Зарегистрироваться
+                </u>
+              </button>
+            </p>
+          </div>
       </div>
+     </div>
     </div>
   )
 }

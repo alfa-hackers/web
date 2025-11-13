@@ -16,7 +16,8 @@ import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
 import RegisterModal from './RegisterModal'
 import LoginModal from './LoginModal'
-import '../../styles/landing/landing.scss'
+import '@/styles/landing/landing.scss'
+import '@/styles/Media/mobile.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
 import { initializeAuth } from '../../store/features/auth/authSlice'
 
@@ -91,6 +92,10 @@ const ChatLanding: React.FC = () => {
     setLoginModalOpen(false)
   }
 
+  const openRegisterModal = () => {
+    setRegisterModalOpen(true)
+  }
+
   const currentChat = chats.find((chat) => chat.id === activeChat)
 
   return (
@@ -101,12 +106,6 @@ const ChatLanding: React.FC = () => {
             <button
               className="login-btn"
               onClick={() => setLoginModalOpen(!loginModalOpen)}
-            >
-              🔒
-            </button>
-            <button
-              className="login-btn"
-              onClick={() => setRegisterModalOpen(!registerModalOpen)}
             >
               🔒
             </button>
@@ -151,10 +150,13 @@ const ChatLanding: React.FC = () => {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSuccess={handleLoginSuccess}
+        onOpenRegister={openRegisterModal}
       />
+
       <RegisterModal
         isOpen={registerModalOpen}
         onClose={() => setRegisterModalOpen(false)}
+        onSuccess={() => setRegisterModalOpen(false)}
       />
     </div>
   )
