@@ -100,6 +100,7 @@ export class AuthService {
     if (user) {
       user.username = traits.username
       user.email = traits.email
+      user.temp = false
       return await this.userRepository.save(user)
     }
 

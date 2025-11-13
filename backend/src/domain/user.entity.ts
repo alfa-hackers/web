@@ -27,6 +27,9 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   avatar_url?: string
 
+  @Column({ type: 'boolean', default: false })
+  temp: boolean
+
   @Column({ type: 'varchar', unique: true, nullable: true })
   userTempId?: string
 

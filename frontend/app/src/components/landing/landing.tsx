@@ -13,7 +13,8 @@ import {
 } from '../../store/features/chat/chatTypes'
 import Sidebar from './Sidebar'
 import MainViewport from './MainViewport'
-import Modal from './Modal'
+import RegisterModal from './RegisterModal'
+import LoginModal from './LoginModal'
 import '../../styles/landing/landing.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
 
@@ -39,7 +40,8 @@ const ChatLanding: React.FC = () => {
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [registerModalOpen, setRegisterModalOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { sendMessage, isConnected } = useWebSocket()
 
@@ -69,14 +71,6 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
-
-  const handleLoginClick = () => {
-    setModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-  }
 
   const handleNewChat = () => {
     dispatch(setCreatingNew(true))
@@ -115,7 +109,16 @@ const ChatLanding: React.FC = () => {
   return (
     <div className="chat-landing">
       <div className="header-actions">
-        <button className="login-btn" onClick={() => setModalOpen(!modalOpen)}>
+        <button
+          className="login-btn"
+          onClick={() => setLoginModalOpen(!loginModalOpen)}
+        >
+          🔒
+        </button>
+        <button
+          className="login-btn"
+          onClick={() => setRegisterModalOpen(!registerModalOpen)}
+        >
           🔒
         </button>
         <button
@@ -153,7 +156,14 @@ const ChatLanding: React.FC = () => {
         onAttachmentsChange={setAttachments}
       />
 
-      <Modal isOpen={modalOpen} onClose={handleCloseModal} />
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
+      <RegisterModal
+        isOpen={registerModalOpen}
+        onClose={() => setRegisterModalOpen(false)}
+      />
     </div>
   )
 }
