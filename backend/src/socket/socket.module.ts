@@ -20,9 +20,10 @@ import { WordProcessService } from './services/payloads/word-process.service'
 import { PdfProcessService } from './services/payloads/pdf-process.service'
 import { ExcelProcessService } from './services/payloads/excel-process.service'
 import { RoomConnectionService } from './services/room/room-connection.service'
+import { AuthModule } from 'controllers/auth/auth.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
+  imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
   providers: [
     SocketGateway,
     ClientManagerService,

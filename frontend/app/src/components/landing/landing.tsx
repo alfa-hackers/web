@@ -18,13 +18,14 @@ import RegisterModal from './RegisterModal'
 import LoginModal from './LoginModal'
 import '../../styles/landing/landing.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
+import { initializeAuth } from '../../store/features/auth/authSlice'
 
 const ChatLanding: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { chats, activeChat } = useSelector((state: RootState) => state.chat)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const [inputValue, setInputValue] = useState('')
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
-  const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [registerModalOpen, setRegisterModalOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
@@ -32,6 +33,7 @@ const ChatLanding: React.FC = () => {
   const { sendMessage, isConnected } = useWebSocket()
 
   useEffect(() => {
+    dispatch(initializeAuth())
     const initializeApp = async () => {
       try {
         await fetch(
@@ -94,18 +96,22 @@ const ChatLanding: React.FC = () => {
   return (
     <div className="chat-landing">
       <div className="header-actions">
-        <button
-          className="login-btn"
-          onClick={() => setLoginModalOpen(!loginModalOpen)}
-        >
-          🔒
-        </button>
-        <button
-          className="login-btn"
-          onClick={() => setRegisterModalOpen(!registerModalOpen)}
-        >
-          🔒
-        </button>
+        {!isAuthenticated && (
+          <>
+            <button
+              className="login-btn"
+              onClick={() => setLoginModalOpen(!loginModalOpen)}
+            >
+              🔒
+            </button>
+            <button
+              className="login-btn"
+              onClick={() => setRegisterModalOpen(!registerModalOpen)}
+            >
+              🔒
+            </button>
+          </>
+        )}
         <button
           className="mobile-menu-btn"
           onClick={() => setSidebarOpen(!sidebarOpen)}

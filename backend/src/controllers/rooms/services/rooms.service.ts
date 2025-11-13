@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Room } from 'domain/room.entity'
 import { User } from 'domain/user.entity'
-import { FastifyRequest } from 'fastify'
 
 @Injectable()
 export class RoomsService {
@@ -14,22 +13,21 @@ export class RoomsService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getRoomsByUserId(request: FastifyRequest) {
-    const userTempId = request.session.user_temp_id
-    if (!userTempId) {
-      throw new UnauthorizedException('User session not found')
+  async getRoomsByUserId(userId: string) {
+    if (!userId) {
+      throw new UnauthorizedException('User ID not provided')
     }
 
-    const userExists = await this.userRepository.findOne({ where: { id: userTempId } })
+    const userExists = await this.userRepository.findOne({ where: { id: userId } })
     if (!userExists) {
-      throw new NotFoundException(`User with ID ${userTempId} not found`)
+      throw new NotFoundException(`User with ID ${userId} not found`)
     }
 
     const rooms = await this.roomRepository
       .createQueryBuilder('room')
       .leftJoinAndSelect('room.owner', 'owner')
       .leftJoin('room.userRooms', 'userRoom')
-      .where('userRoom.userId = :userId', { userId: userTempId })
+      .where('userRoom.userId = :userId', { userId })
       .orderBy('room.createdAt', 'DESC')
       .getMany()
 
