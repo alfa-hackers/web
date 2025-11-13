@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { SocketGateway } from './socket.gateway'
 import { ClientManagerService } from './client-manager.service'
 import { AIService } from './ai.service'
-import { RoomService } from './services/room.service'
+import { RoomService } from './services/room/room.service'
 import { MessageService } from './services/message.service'
 import { User } from 'domain/user.entity'
 import { Message } from 'domain/message.entity'
@@ -19,9 +19,11 @@ import { WordResponseService } from './services/responses/word-response.service'
 import { WordProcessService } from './services/payloads/word-process.service'
 import { PdfProcessService } from './services/payloads/pdf-process.service'
 import { ExcelProcessService } from './services/payloads/excel-process.service'
+import { RoomConnectionService } from './services/room/room-connection.service'
+import { AuthModule } from 'controllers/auth/auth.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom])],
+  imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
   providers: [
     SocketGateway,
     ClientManagerService,
@@ -38,6 +40,7 @@ import { ExcelProcessService } from './services/payloads/excel-process.service'
     WordProcessService,
     PdfProcessService,
     ExcelProcessService,
+    RoomConnectionService,
   ],
   exports: [ClientManagerService],
 })

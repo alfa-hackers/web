@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common'
 import { MessagesService } from 'controllers/messages/services/messages.service'
 import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
 import { ApiBody } from '@nestjs/swagger'
+import { FastifyRequest } from 'fastify'
 
 @Controller('messages')
 export class MessagesController {
@@ -15,15 +16,14 @@ export class MessagesController {
       example1: {
         summary: 'Пример запроса сообщений',
         value: {
-          userId: '15f29d79-e862-4250-bebf-75f7a0ab69db',
           roomId: 'room123',
           limit: 10,
         },
       },
     },
   })
-  async getUserMessages(@Body() body: GetUserMessagesDto) {
-    return this.messagesService.getMessagesByUserId(body)
+  async getUserMessages(@Body() body: GetUserMessagesDto, @Req() request: FastifyRequest) {
+    return this.messagesService.getMessagesByUserId(body, request)
   }
 
   @Post('/by-room')
@@ -41,8 +41,8 @@ export class MessagesController {
       },
     },
   })
-  async getRoomMessages(@Body() body: GetRoomMessagesDto) {
-    return this.messagesService.getMessagesByRoomId(body)
+  async getRoomMessages(@Body() body: GetRoomMessagesDto, @Req() request: FastifyRequest) {
+    return this.messagesService.getMessagesByRoomId(body, request)
   }
 
   @Get('/:id')

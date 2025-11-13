@@ -68,6 +68,30 @@ export class AuthService {
     return { data: response.data, cookies: response.headers['set-cookie'] }
   }
 
+  async getCurrentUser(req: FastifyRequest) {
+    const cookie = req.headers.cookie
+    if (!cookie) return null
+
+    try {
+      const response = await axios.get(`${this.kratosPublicUrl}/sessions/whoami`, {
+        headers: { cookie },
+        withCredentials: true,
+      })
+
+      const kratosIdentity = response.data.identity
+      if (!kratosIdentity) return null
+
+      let user = await this.getUserFromSession(kratosIdentity.id)
+      if (!user) {
+        user = await this.syncUserToPostgres(kratosIdentity)
+      }
+
+      return user
+    } catch (error) {
+      return error
+    }
+  }
+
   private handleAxiosError(err: any, defaultMessage: string) {
     const errorMessage =
       err.response?.data?.ui?.messages?.[0]?.text ||
@@ -100,6 +124,7 @@ export class AuthService {
     if (user) {
       user.username = traits.username
       user.email = traits.email
+      user.temp = false
       return await this.userRepository.save(user)
     }
 

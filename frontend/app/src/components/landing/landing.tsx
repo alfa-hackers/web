@@ -5,6 +5,7 @@ import {
   setActiveChat,
   setCreatingNew,
   deleteChat,
+  resetChats,
 } from '../../store/features/chat/chatSlice'
 import { useWebSocket } from '../../store/features/chat/useWebSocket'
 import {
@@ -17,52 +18,33 @@ import Modal from './Modal'
 import '@/styles/landing/landing.scss'
 import '@/styles/Media/mobile.scss'
 import { loadChats } from '../../store/features/chat/loadChats'
-
-const getCookie = (name: string): string | null => {
-  const matches = document.cookie.match(
-    new RegExp(
-      '(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'
-    )
-  )
-  return matches ? decodeURIComponent(matches[1]) : null
-}
-
-const getApiUrl = (): string => {
-  return process.env.NODE_ENV === 'production'
-    ? 'https://api.whirav.ru'
-    : 'http://localhost:3000'
-}
+import { initializeAuth } from '../../store/features/auth/authSlice'
 
 const ChatLanding: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { chats, activeChat } = useSelector((state: RootState) => state.chat)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const [inputValue, setInputValue] = useState('')
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
-  const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [registerModalOpen, setRegisterModalOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { sendMessage, isConnected } = useWebSocket()
 
   useEffect(() => {
+    dispatch(initializeAuth())
     const initializeApp = async () => {
       try {
-        const response = await fetch(`${getApiUrl()}/health`, {
-          method: 'GET',
-          credentials: 'include',
-          mode: 'cors',
-        })
-        if (response.ok) {
-          const userId = getCookie('user_temp_id')
-          if (userId) {
-            dispatch(loadChats(userId))
-          } else {
-            console.error('user_temp_id не найден в cookies')
+        await fetch(
+          `${process.env.NODE_ENV === 'production' ? 'https://api.whirav.ru' : 'http://localhost:3000'}/health`,
+          {
+            method: 'GET',
+            credentials: 'include',
           }
-        }
-      } catch (error) {
-        console.error('Ошибка health check:', error)
-      }
+        )
+        dispatch(loadChats())
+      } catch {}
     }
     initializeApp()
   }, [dispatch])
@@ -70,14 +52,6 @@ const ChatLanding: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, activeChat])
-
-  const handleLoginClick = () => {
-    setModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-  }
 
   const handleNewChat = () => {
     dispatch(setCreatingNew(true))
@@ -88,8 +62,8 @@ const ChatLanding: React.FC = () => {
 
   const handleSendMessage = (messageFlag: MessageFlag) => {
     const currentChat = chats.find((chat) => chat.id === activeChat)
-    const isWaitingForResponse = currentChat?.isWaitingForResponse || false
-    if (!inputValue.trim() || !isConnected || isWaitingForResponse) return
+    if (!inputValue.trim() || !isConnected || currentChat?.isWaitingForResponse)
+      return
     sendMessage(
       inputValue,
       messageFlag,
@@ -109,6 +83,12 @@ const ChatLanding: React.FC = () => {
   const handleSelectChat = (chatId: string) => {
     dispatch(setActiveChat(chatId))
     setSidebarOpen(false)
+  }
+
+  const handleLoginSuccess = () => {
+    dispatch(resetChats())
+    dispatch(loadChats())
+    setLoginModalOpen(false)
   }
 
   const currentChat = chats.find((chat) => chat.id === activeChat)

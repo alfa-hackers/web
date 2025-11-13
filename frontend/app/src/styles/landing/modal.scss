@@ -1,4 +1,4 @@
-@import "../Global/variables.scss";
+@use '../Global/variables' as *;
 
 .modal-overlay {
   position: fixed;
@@ -126,6 +126,7 @@ form {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

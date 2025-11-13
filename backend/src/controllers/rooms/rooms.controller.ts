@@ -1,27 +1,40 @@
-import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
+import { Controller, Post, Delete, Param, HttpCode, HttpStatus, Req, Logger } from '@nestjs/common'
 import { RoomsService } from 'controllers/rooms/services/rooms.service'
-import { GetUserRoomsDto } from 'controllers/rooms/dto/rooms.dto'
-import { ApiBody } from '@nestjs/swagger'
+import { FastifyRequest } from 'fastify'
+import { AuthService } from 'controllers/auth/services'
 
 @Controller('rooms')
 export class RoomsController {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('/by-user')
-  @ApiBody({
-    description: 'Запрос комнат пользователя',
-    type: GetUserRoomsDto,
-    examples: {
-      example1: {
-        summary: 'Пример запроса комнат',
-        value: {
-          userId: '15f29d79-e862-4250-bebf-75f7a0ab69db',
-        },
-      },
-    },
-  })
-  async getUserRooms(@Body() body: GetUserRoomsDto) {
-    return this.roomsService.getRoomsByUserId(body)
+  async getUserRooms(@Req() request: FastifyRequest) {
+    try {
+      let userId: string | null = null
+
+      if (request.headers.cookie) {
+        const currentUser = await this.authService.getCurrentUser(request)
+        if (currentUser?.id) {
+          userId = currentUser.id
+        }
+      }
+
+      if (!userId) {
+        userId = request.session?.user_temp_id || null
+      }
+
+      if (!userId) {
+        return []
+      }
+
+      return this.roomsService.getRoomsByUserId(userId)
+    } catch (error) {
+      Logger.error('Error fetching user rooms', error)
+      return []
+    }
   }
 
   @Delete('/:id')

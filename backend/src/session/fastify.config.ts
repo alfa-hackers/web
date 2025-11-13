@@ -24,6 +24,7 @@ export function registerFastifyPlugins(app) {
   fastify.register(fastifyCors, {
     origin: allowedOrigins,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 
@@ -49,7 +50,7 @@ export function registerFastifyPlugins(app) {
   fastify.register(fastifySession, {
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
-    cookieName: 'fastify_temp_session',
+    cookieName: 'user_temp_id',
     cookie: cookieConfig,
     store: redisStore,
   })

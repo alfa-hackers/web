@@ -1,10 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { User } from 'domain/user.entity'
-import { GetUserRoomsDto } from 'controllers/rooms/dto/rooms.dto'
 
 @Injectable()
 export class RoomsService {
@@ -15,9 +13,10 @@ export class RoomsService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-
-  async getRoomsByUserId(query: GetUserRoomsDto) {
-    const { userId } = query
+  async getRoomsByUserId(userId: string) {
+    if (!userId) {
+      throw new UnauthorizedException('User ID not provided')
+    }
 
     const userExists = await this.userRepository.findOne({ where: { id: userId } })
     if (!userExists) {
@@ -39,7 +38,7 @@ export class RoomsService {
       },
     }
   }
-  
+
   async deleteRoom(roomId: string) {
     const room = await this.roomRepository.findOne({
       where: { id: roomId },
