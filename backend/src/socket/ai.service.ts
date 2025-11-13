@@ -15,7 +15,7 @@ export class AIService {
   async generateResponse(
     messages: Array<{ role: string; content: string }>,
     temperature: number = 0.7,
-    messageType: 'text' | 'pdf' | 'word' | 'excel' = 'text',
+    messageType: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist',
   ): Promise<AIResponse> {
     const apiUrl =
       this.configService.get<string>('OPENAI_API_URL') ||
@@ -57,6 +57,27 @@ Output must be clean, readable text with no extra content.`,
             Generate ONLY raw CSV text from the Excel content.
             Do NOT include explanations, comments, extra words, or formatting.
             Output must be pure CSV, with commas separating values and newlines separating rows.`,
+        })
+        break
+
+      case 'powerpoint':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that creates PowerPoint presentations.
+Generate ONLY plain text content for slides.
+Each slide content should be separated by double newlines.
+Do NOT include explanations, comments, slide numbers, or formatting instructions.
+Output must be clean, presentation-ready text with no extra content.`,
+        })
+        break
+
+      case 'checklist':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that creates checklists.
+Generate ONLY a list of checklist items, one per line.
+Do NOT include explanations, comments, checkboxes, or formatting.
+Output must be plain text items with no extra content.`,
         })
         break
 

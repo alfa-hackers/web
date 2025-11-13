@@ -63,6 +63,7 @@
     "pdfkit": "^0.17.2",
     "pdfreader": "^3.0.8",
     "pg": "^8.16.3",
+    "pptxgenjs": "^4.0.1",
     "prisma": "^6.4.1",
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",

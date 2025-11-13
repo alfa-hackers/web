@@ -11,6 +11,8 @@ import { SaveMinioService } from './save-minio.service'
 import { PdfResponseService } from './responses/pdf-response.service'
 import { WordResponseService } from './responses/word-response.service'
 import { ExcelResponseService } from './responses/excel-response.service'
+import { PowerpointResponseService } from './responses/powerpoint-reponse.service'
+import { ChecklistResponseService } from './responses/checklist-response.service'
 import { PdfProcessService } from './payloads/pdf-process.service'
 import { WordProcessService } from './payloads/word-process.service'
 import { ExcelProcessService } from './payloads/excel-process.service'
@@ -25,6 +27,8 @@ export class MessageService {
     private readonly pdfResponseService: PdfResponseService,
     private readonly wordResponseService: WordResponseService,
     private readonly excelResponseService: ExcelResponseService,
+    private readonly powerpointResponseService: PowerpointResponseService,
+    private readonly checklistResponseService: ChecklistResponseService,
     private readonly pdfProcessService: PdfProcessService,
     private readonly wordProcessService: WordProcessService,
     private readonly excelProcessService: ExcelProcessService,
@@ -50,6 +54,7 @@ export class MessageService {
     if (attachments?.length) {
       for (const attachment of attachments) {
         let extractedText = ''
+
         switch (attachment.mimeType) {
           case 'application/pdf':
             extractedText = await this.pdfProcessService.process(attachment)
@@ -66,6 +71,7 @@ export class MessageService {
             extractedText = await this.excelProcessService.process(attachment)
             break
         }
+
         const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
         if (savedFileUrl) fileUrl = savedFileUrl
         if (extractedText) processedContent += `\n\n${extractedText}`
@@ -87,6 +93,7 @@ export class MessageService {
 
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
+
       const temperatureMap: Record<string, number> = {
         text: process.env.MODEL_TEMPERATURE_TEXT
           ? parseFloat(process.env.MODEL_TEMPERATURE_TEXT)
@@ -100,9 +107,16 @@ export class MessageService {
         excel: process.env.MODEL_TEMPERATURE_EXCEL
           ? parseFloat(process.env.MODEL_TEMPERATURE_EXCEL)
           : 0.6,
+        powerpoint: process.env.MODEL_TEMPERATURE_POWERPOINT
+          ? parseFloat(process.env.MODEL_TEMPERATURE_POWERPOINT)
+          : 1.0,
+        checklist: process.env.MODEL_TEMPERATURE_CHECKLIST
+          ? parseFloat(process.env.MODEL_TEMPERATURE_CHECKLIST)
+          : 0.8,
       }
 
       const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
+
       const aiResponse = await aiService.generateResponse(
         combinedMessages,
         temperature,
@@ -123,6 +137,17 @@ export class MessageService {
           break
         case 'excel':
           responseFileUrl = await this.excelResponseService.generate(aiResponse.content, roomId)
+          formattedResponse = aiResponse.content
+          break
+        case 'powerpoint':
+          responseFileUrl = await this.powerpointResponseService.generate(
+            aiResponse.content,
+            roomId,
+          )
+          formattedResponse = aiResponse.content
+          break
+        case 'checklist':
+          responseFileUrl = await this.checklistResponseService.generate(aiResponse.content, roomId)
           formattedResponse = aiResponse.content
           break
         case 'text':
@@ -149,9 +174,17 @@ export class MessageService {
         response_type: messageFlag,
       })
 
-      return { success: true, responseType: messageFlag, fileUrl: responseFileUrl }
+      return {
+        success: true,
+        responseType: messageFlag,
+        fileUrl: responseFileUrl,
+      }
     } catch (error) {
-      server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
+      server.to(roomId).emit('message', {
+        userId: 'system',
+        message: `AI Error: ${error.message}`,
+      })
+
       return { success: false, error: error.message }
     }
   }

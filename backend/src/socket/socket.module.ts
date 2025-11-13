@@ -21,6 +21,8 @@ import { PdfProcessService } from './services/payloads/pdf-process.service'
 import { ExcelProcessService } from './services/payloads/excel-process.service'
 import { RoomConnectionService } from './services/room/room-connection.service'
 import { AuthModule } from 'controllers/auth/auth.module'
+import { PowerpointResponseService } from './services/responses/powerpoint-reponse.service'
+import { ChecklistResponseService } from './services/responses/checklist-response.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
@@ -41,6 +43,8 @@ import { AuthModule } from 'controllers/auth/auth.module'
     PdfProcessService,
     ExcelProcessService,
     RoomConnectionService,
+    PowerpointResponseService,
+    ChecklistResponseService,
   ],
   exports: [ClientManagerService],
 })
