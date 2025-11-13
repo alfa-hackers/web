@@ -30,13 +30,17 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const validateForm = () => {
     const errors = { email: '', password: '' }
 
-    if (!formData.email.trim()) errors.email = 'Введите email'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+    if (!formData.email.trim()) {
+      errors.email = 'Введите email'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Неверный формат email'
+    }
 
-    if (!formData.password) errors.password = 'Пароль не может быть пустым'
-    else if (formData.password.length < 6)
+    if (!formData.password) {
+      errors.password = 'Пароль не может быть пустым'
+    } else if (formData.password.length < 6) {
       errors.password = 'Пароль должен быть не меньше 6 символов'
+    }
 
     setValidationErrors(errors)
     return !errors.email && !errors.password
@@ -51,6 +55,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (!validateForm()) return
 
     const success = await login({
@@ -61,8 +66,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
     if (success) {
       setFormData({ email: '', password: '' })
       setValidationErrors({ email: '', password: '' })
-      if (onSuccess) onSuccess()
-      else onClose()
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        onClose()
+      }
     }
   }
 
@@ -79,12 +87,12 @@ const LoginModal: React.FC<LoginModalProps> = ({
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="btn-container">
-       <button className="modal-btn-exit" onClick={handleClose}>
-         ✕
-       </button>
-     </div>
+        <button className="modal-btn-exit" onClick={handleClose}>
+          ✕
+        </button>
+      </div>
       <div
         className="modal-content-wrapper"
         onClick={(e) => e.stopPropagation()}
@@ -104,7 +112,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 placeholder="Email"
                 className={validationErrors.email ? 'error' : ''}
                 disabled={isLoading}
-                required
+                autoComplete="email"
               />
               {validationErrors.email && (
                 <span className="error-message">{validationErrors.email}</span>
@@ -120,7 +128,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 placeholder="Пароль"
                 className={validationErrors.password ? 'error' : ''}
                 disabled={isLoading}
-                required
+                autoComplete="current-password"
               />
               {validationErrors.password && (
                 <span className="error-message">

@@ -5,6 +5,8 @@ import { AuthService } from 'controllers/auth/services'
 
 @Controller('rooms')
 export class RoomsController {
+  private readonly logger = new Logger(RoomsController.name)
+
   constructor(
     private readonly roomsService: RoomsService,
     private readonly authService: AuthService,
@@ -13,26 +15,11 @@ export class RoomsController {
   @Post('/by-user')
   async getUserRooms(@Req() request: FastifyRequest) {
     try {
-      let userId: string | null = null
-
-      if (request.headers.cookie) {
-        const currentUser = await this.authService.getCurrentUser(request)
-        if (currentUser?.id) {
-          userId = currentUser.id
-        }
-      }
-
-      if (!userId) {
-        userId = request.session?.user_temp_id || null
-      }
-
-      if (!userId) {
-        return []
-      }
-
+      const userId = await this.roomsService.extractUserId(request, this.authService)
+      if (!userId) return []
       return this.roomsService.getRoomsByUserId(userId)
     } catch (error) {
-      Logger.error('Error fetching user rooms', error)
+      this.logger.error('Error fetching user rooms', error.stack || error.message)
       return []
     }
   }

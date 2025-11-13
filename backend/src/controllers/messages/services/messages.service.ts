@@ -10,6 +10,8 @@ import { AuthService } from 'controllers/auth/services'
 
 @Injectable()
 export class MessagesService {
+  private readonly logger = new Logger(MessagesService.name)
+
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
@@ -25,7 +27,7 @@ export class MessagesService {
       const kratosUser = await this.authService.getCurrentUser(request)
       if (kratosUser?.id) return kratosUser.id
     } catch (err) {
-      Logger.log(err)
+      this.logger.error('Failed to get user from Kratos', err.stack || err.message)
     }
 
     const sessionUserId = request.session?.user_temp_id
@@ -37,7 +39,7 @@ export class MessagesService {
 
   async getMessagesByRoomId(dto: GetRoomMessagesDto, request: FastifyRequest) {
     const { roomId, limit, offset } = dto
-    const userId = await this.getUserId(request) // Берём userId через Kratos/session
+    const userId = await this.getUserId(request)
 
     const room = await this.roomRepository.findOne({ where: { id: roomId } })
     if (!room) {
@@ -52,20 +54,12 @@ export class MessagesService {
       skip: offset,
     })
 
-    return {
-      data: messages,
-      meta: {
-        total: messages.length,
-        limit,
-        offset,
-        userId, // можно вернуть для фронта
-      },
-    }
+    return { data: messages, meta: { total: messages.length, limit, offset, userId } }
   }
 
   async getMessagesByUserId(dto: GetUserMessagesDto, request: FastifyRequest) {
     const { roomId, limit, offset } = dto
-    const userId = await this.getUserId(request) // Берём userId через Kratos/session
+    const userId = await this.getUserId(request)
 
     const userExists = await this.userRepository.findOne({ where: { id: userId } })
     if (!userExists) {
@@ -73,9 +67,7 @@ export class MessagesService {
     }
 
     const whereCondition: any = { userId }
-    if (roomId) {
-      whereCondition.roomId = roomId
-    }
+    if (roomId) whereCondition.roomId = roomId
 
     const messages = await this.messageRepository.find({
       where: whereCondition,
@@ -85,15 +77,7 @@ export class MessagesService {
       skip: offset,
     })
 
-    return {
-      data: messages,
-      meta: {
-        total: messages.length,
-        limit,
-        offset,
-        userId,
-      },
-    }
+    return { data: messages, meta: { total: messages.length, limit, offset, userId } }
   }
 
   async getMessageById(messageId: string) {
