@@ -121,6 +121,19 @@
         color: $color-text;
       }
 
+      .message-attachments {
+        color: $color-text-light;
+        margin-top: 10px;
+
+        a {
+          padding-right: 10px;
+          &:hover {
+            color: $color-accent-hover;
+
+          }
+        }
+      }
+
       .message-status {
         margin-top: 8px;
         font-size: 11px;
@@ -177,6 +190,115 @@
       &.disconnected {
         color: $color-sidebar-bg;
         background: $color-sidebar-bg;
+      }
+    }
+
+    .attachments-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px;
+      background-color: $color-white;
+      border-radius: $radius-sm;
+      border: 1px solid $color-border-light;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      
+      .attachment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: $color-bg;
+        border-radius: $radius-sm;
+        border: 1px solid $color-border-light;
+        transition: $transition-fast;
+      
+        &:hover {
+          background-color: $color-accent-hover;
+          border-color: $color-accent;
+        }
+      
+        .attachment-name {
+          font-size: 14px;
+          color: $color-text;
+          flex-grow: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      
+        .remove-attachment {
+          background: none;
+          border: none;
+          color: $color-alfa;
+          font-size: 16px;
+          cursor: pointer;
+          transition: $transition-fast;
+      
+          &:hover {
+            color: $color-alfa-hover;
+          }
+        }
+      }
+    }
+
+
+    .format-selector {
+      display: flex;
+      align-items: center;
+      background-color: $color-bg;
+      padding: 10px;
+      max-width: 750px;
+
+      .format-label {
+        white-space: nowrap;
+        margin-right: 8px;
+        color: $color-text;
+        font-family: $font-family-base;
+      }
+
+      .format-options {
+        display: flex;
+        flex-flow: row wrap;
+        width:100%;
+        gap: 2%;
+      }
+
+      .format-badge {
+        display: flex;
+        align-items: center;
+        gap: 5%;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: $transition-fast;
+
+        .format-text {
+          color: $color-text;
+        }
+
+        .format-icon {
+          color: $color-text;
+        }
+
+        &:hover {
+          background: $color-accent-hover;
+          border-color: $color-accent-hover;
+          color: $color-white;
+        }
+
+        &.active {
+          background: $color-accent; 
+          color: $color-white;
+          border-color: $color-accent;
+        }
+      }
+
+      button.format-badge {
+        border-radius: $radius-sm;
+        width: 20%;
+        height: 6vh;
+        max-height: 30px;
+        font-size: 14px;
       }
     }
 

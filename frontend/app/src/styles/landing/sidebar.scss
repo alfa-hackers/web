@@ -80,6 +80,7 @@
 
       .chat-title {
         flex: 1;
+        max-width: calc(100% - 50px);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
