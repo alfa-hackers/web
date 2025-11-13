@@ -45,6 +45,12 @@
   margin: 0;
 }
 
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
 .btn-container {
   width: 100%;
   display: flex;
@@ -85,31 +91,31 @@ form {
   transition: border-color 0.3s ease;
 
   &:focus {
-    border-color: $color-accent;
+    border-color: $color-dark;
   }
 }
 
 .submit-btn {
   padding: 12px;
-  background-color: $color-dark;
+  background-color: $color-border;
   color: $color-white;
   border: none;
   border-radius: $radius-lg;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: not-allowed;
   transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: $color-accent-hover;
-  }
-
-  &:active {
-    background-color: darken($color-accent, 10%);
-  }
 
   &:disabled {
     background-color: $color-border-light;
-    cursor: not-allowed;
+  }
+}
+
+.submit-btn.filled {
+  background-color: $color-dark;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $color-accent-hover;
   }
 }
 
