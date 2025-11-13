@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import pptxgen from 'pptxgenjs'
+import { Injectable, Logger } from '@nestjs/common'
+import * as PptxGenJS from 'pptxgenjs'
 import { SaveMinioService } from '../save-minio.service'
 
 @Injectable()
 export class PowerpointResponseService {
+  private readonly logger = new Logger(PowerpointResponseService.name)
+
   constructor(private readonly saveMinioService: SaveMinioService) {}
 
   async generate(content: string, roomId: string): Promise<string> {
-    try {
-      const pptx = new pptxgen()
+    const startTime = Date.now()
+    this.logger.log(`Starting PowerPoint generation for room: ${roomId}`)
 
+    try {
+      const pptx = new (PptxGenJS as any)()
       const slides = content.split('\n\n')
 
       slides.forEach((slideContent) => {
@@ -26,7 +30,6 @@ export class PowerpointResponseService {
 
       const buffer = (await pptx.write({ outputType: 'nodebuffer' })) as Buffer
       const base64Data = buffer.toString('base64')
-
       const filename = `response_${Date.now()}.pptx`
 
       const fileUrl = await this.saveMinioService.saveFile(
@@ -39,8 +42,16 @@ export class PowerpointResponseService {
         roomId,
       )
 
+      this.logger.log(
+        `PowerPoint successfully saved for room ${roomId}: ${fileUrl} (Generation time: ${Date.now() - startTime}ms)`,
+      )
+
       return fileUrl
     } catch (error) {
+      this.logger.error(
+        `Failed to generate PowerPoint for room ${roomId}: ${error.message}`,
+        error.stack,
+      )
       throw error
     }
   }

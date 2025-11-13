@@ -18,6 +18,8 @@ export interface FileAttachment {
     | 'application/vnd.ms-powerpoint'
     | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     | 'text/plain'
+    | 'application/octet-stream'
+
   data: string
   size: number
 }
