@@ -96,6 +96,12 @@ const ChatLanding: React.FC = () => {
     setRegisterModalOpen(true)
   }
 
+  const handleRegisterSuccess = () => {
+    dispatch(resetChats())
+    dispatch(loadChats())
+    setRegisterModalOpen(false)
+  }
+
   const currentChat = chats.find((chat) => chat.id === activeChat)
 
   return (
@@ -156,7 +162,7 @@ const ChatLanding: React.FC = () => {
       <RegisterModal
         isOpen={registerModalOpen}
         onClose={() => setRegisterModalOpen(false)}
-        onSuccess={() => setRegisterModalOpen(false)}
+        onSuccess={handleRegisterSuccess}
       />
     </div>
   )
