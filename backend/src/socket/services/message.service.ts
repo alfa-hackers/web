@@ -101,7 +101,6 @@ export class MessageService {
 
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
-
       const temperatureMap: Record<string, number> = {
         text: process.env.MODEL_TEMPERATURE_TEXT
           ? parseFloat(process.env.MODEL_TEMPERATURE_TEXT)
@@ -121,14 +120,17 @@ export class MessageService {
         checklist: process.env.MODEL_TEMPERATURE_CHECKLIST
           ? parseFloat(process.env.MODEL_TEMPERATURE_CHECKLIST)
           : 0.8,
+        business: process.env.MODEL_TEMPERATURE_BUSINESS
+          ? parseFloat(process.env.MODEL_TEMPERATURE_BUSINESS)
+          : 1.0,
       }
 
       const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
 
       const aiResponse = await aiService.generateResponse(
         combinedMessages,
-        temperature,
         messageFlag,
+        temperature,
       )
 
       let formattedResponse: string
@@ -156,6 +158,9 @@ export class MessageService {
           break
         case 'checklist':
           responseFileUrl = await this.checklistResponseService.generate(aiResponse.content, roomId)
+          formattedResponse = aiResponse.content
+          break
+        case 'business':
           formattedResponse = aiResponse.content
           break
         case 'text':

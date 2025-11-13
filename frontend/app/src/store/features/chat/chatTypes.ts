@@ -5,6 +5,7 @@ export type MessageFlag =
   | 'excel'
   | 'powerpoint'
   | 'checklist'
+  | 'business'
 
 export interface FileAttachment {
   filename: string

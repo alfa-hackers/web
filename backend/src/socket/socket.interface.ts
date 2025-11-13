@@ -4,7 +4,7 @@ export interface SendMessagePayload {
   messageId?: string
   chatId?: string
   attachments?: FileAttachment[]
-  messageFlag?: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist'
+  messageFlag?: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist' | 'business'
   temperature?: number
 }
 
