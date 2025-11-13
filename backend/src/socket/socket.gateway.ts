@@ -17,40 +17,62 @@ import { JoinRoomPayload, SendMessagePayload } from 'socket/socket.interface'
 import { RoomService } from 'socket/services/room/room.service'
 import { MessageService } from 'socket/services/message.service'
 import { RoomConnectionService } from './services/room/room-connection.service'
+import { Logger } from '@nestjs/common'
 
 @WebSocketGateway({
-  cors: { origin: '*', credentials: true },
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+  transports: ['websocket', 'polling'],
 })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server
+
+  private readonly logger = new Logger(SocketGateway.name)
 
   constructor(
     private readonly clientManager: ClientManagerService,
     private readonly aiService: AIService,
     private readonly roomService: RoomService,
     private readonly messageService: MessageService,
-    private readonly roomconnectionService: RoomConnectionService,
+    private readonly roomConnectionService: RoomConnectionService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
   async handleConnection(socket: Socket) {
-    const { user, userTempId } = await this.roomconnectionService.handleConnection(socket)
+    try {
+      const userTempId = socket.handshake.auth?.user_temp_id as string
 
-    const userId = await this.clientManager.createUser(socket.id)
-    socket.data.userTempId = userTempId
-    socket.data.dbUserId = user.id
+      if (!userTempId) {
+        socket.emit('error', { message: 'userTempId is required' })
+        socket.disconnect()
+        return
+      }
 
-    socket.emit('connected', { socketId: socket.id, userId, userTempId })
+      const { user } = await this.roomConnectionService.handleConnection(socket, userTempId)
+      const userId = await this.clientManager.createUser(socket.id)
+
+      socket.data.userTempId = userTempId
+      socket.data.dbUserId = user.id
+
+      socket.emit('connected', { socketId: socket.id, userId, userTempId })
+    } catch (error) {
+      socket.emit('error', { message: error.message })
+      socket.disconnect()
+    }
   }
 
   async handleDisconnect(socket: Socket) {
-    const userId = await this.clientManager.getUserBySocketId(socket.id)
-    if (userId) {
-      await this.roomService.broadcastDisconnection(userId, this.clientManager, this.server)
-      await this.clientManager.removeUser(userId)
-      await this.clientManager.removeSocketMapping(socket.id)
-    }
+    try {
+      const userId = await this.clientManager.getUserBySocketId(socket.id)
+      if (userId) {
+        await this.roomService.broadcastDisconnection(userId, this.clientManager, this.server)
+        await this.clientManager.removeUser(userId)
+        await this.clientManager.removeSocketMapping(socket.id)
+      }
+    } catch {}
   }
 
   @SubscribeMessage('joinRoom')

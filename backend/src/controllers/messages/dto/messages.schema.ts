@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 export const getUserMessagesSchema = z.object({
-  userId: z.string().uuid('Invalid user ID format'),
   roomId: z.string().optional(),
   limit: z.coerce.number().int().positive().max(100).optional().default(50),
   offset: z.coerce.number().int().nonnegative().optional().default(0),

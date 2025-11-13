@@ -1,27 +1,14 @@
-import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common'
+import { Controller, Post, Delete, Param, HttpCode, HttpStatus, Req } from '@nestjs/common'
 import { RoomsService } from 'controllers/rooms/services/rooms.service'
-import { GetUserRoomsDto } from 'controllers/rooms/dto/rooms.dto'
-import { ApiBody } from '@nestjs/swagger'
+import { FastifyRequest } from 'fastify'
 
 @Controller('rooms')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post('/by-user')
-  @ApiBody({
-    description: 'Запрос комнат пользователя',
-    type: GetUserRoomsDto,
-    examples: {
-      example1: {
-        summary: 'Пример запроса комнат',
-        value: {
-          userId: '15f29d79-e862-4250-bebf-75f7a0ab69db',
-        },
-      },
-    },
-  })
-  async getUserRooms(@Body() body: GetUserRoomsDto) {
-    return this.roomsService.getRoomsByUserId(body)
+  async getUserRooms(@Req() request: FastifyRequest) {
+    return this.roomsService.getRoomsByUserId(request)
   }
 
   @Delete('/:id')

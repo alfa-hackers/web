@@ -1,18 +1,27 @@
 import { Injectable } from '@nestjs/common'
-import { MessagesService } from 'controllers/messages/services/messages.service'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Message } from 'domain/message.entity'
 
 @Injectable()
 export class LoadContextService {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
+  ) {}
 
   async loadContext(
     roomId: string,
     userMessage?: string,
     limit: number = 50,
   ): Promise<Array<{ role: string; content: string }>> {
-    const result = await this.messagesService.getMessagesByRoomId({ roomId, limit, offset: 0 })
+    const messages = await this.messageRepository.find({
+      where: { roomId },
+      order: { createdAt: 'DESC' },
+      take: limit,
+    })
 
-    const context = result.data.reverse().map((msg) => ({
+    const context = messages.reverse().map((msg) => ({
       role: msg.messageType === 'user' ? 'user' : 'assistant',
       content: msg.text,
     }))

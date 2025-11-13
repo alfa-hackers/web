@@ -8,7 +8,6 @@ import {
 export class GetUserMessagesDto implements GetUserMessagesType {
   static schema = getUserMessagesSchema
 
-  userId: string
   roomId?: string
   limit?: number
   offset?: number

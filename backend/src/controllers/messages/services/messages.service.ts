@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { User } from 'domain/user.entity'
 import { GetUserMessagesDto, GetRoomMessagesDto } from 'controllers/messages/dto/messages.dto'
+import { FastifyRequest } from 'fastify'
 
 @Injectable()
 export class MessagesService {
@@ -17,8 +18,13 @@ export class MessagesService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getMessagesByRoomId(dto: GetRoomMessagesDto) {
+  async getMessagesByRoomId(dto: GetRoomMessagesDto, request: FastifyRequest) {
     const { roomId, limit, offset } = dto
+
+    const userTempId = request.session.user_temp_id
+    if (!userTempId) {
+      throw new UnauthorizedException('User session not found')
+    }
 
     const room = await this.roomRepository.findOne({ where: { id: roomId } })
 
@@ -44,24 +50,38 @@ export class MessagesService {
     }
   }
 
-  async getMessagesByUserId(query: GetUserMessagesDto) {
-    const { userId } = query
+  async getMessagesByUserId(dto: GetUserMessagesDto, request: FastifyRequest) {
+    const { roomId, limit, offset } = dto
 
-    const userExists = await this.userRepository.findOne({ where: { id: userId } })
+    const userTempId = request.session.user_temp_id
+    if (!userTempId) {
+      throw new UnauthorizedException('User session not found')
+    }
+
+    const userExists = await this.userRepository.findOne({ where: { id: userTempId } })
     if (!userExists) {
-      throw new NotFoundException(`User with ID ${userId} not found`)
+      throw new NotFoundException(`User with ID ${userTempId} not found`)
+    }
+
+    const whereCondition: any = { userId: userTempId }
+    if (roomId) {
+      whereCondition.roomId = roomId
     }
 
     const messages = await this.messageRepository.find({
-      where: { userId },
+      where: whereCondition,
       relations: ['room', 'user'],
       order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
     })
 
     return {
       data: messages,
       meta: {
         total: messages.length,
+        limit,
+        offset,
       },
     }
   }
