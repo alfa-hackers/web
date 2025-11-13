@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { User } from 'domain/user.entity'
 import { Room } from 'domain/room.entity'
 import { UserRoom } from 'domain/user-room.entity'
 import { ClientManagerService } from 'socket/client-manager.service'
@@ -11,34 +10,11 @@ import { JoinRoomPayload } from 'socket/socket.interface'
 @Injectable()
 export class RoomService {
   constructor(
-    @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
-    @InjectRepository(UserRoom) private readonly userRoomRepository: Repository<UserRoom>,
+    @InjectRepository(Room)
+    private readonly roomRepository: Repository<Room>,
+    @InjectRepository(UserRoom)
+    private readonly userRoomRepository: Repository<UserRoom>,
   ) {}
-
-  async handleConnection(socket: Socket, userRepository: Repository<User>) {
-    const userTempId = socket.handshake.headers.cookie
-      ?.split(';')
-      .find((c) => c.trim().startsWith('user_temp_id='))
-      ?.split('=')[1]
-
-    let user: User
-    if (userTempId) {
-      user = await userRepository.findOne({ where: { userTempId } })
-      if (!user) {
-        user = userRepository.create({
-          id: userTempId,
-          username: `temp_${userTempId}`,
-          userTempId,
-          role: 'temp',
-        })
-        await userRepository.save(user)
-      }
-    } else {
-      user = await userRepository.save({ username: `user_${Date.now()}` })
-    }
-
-    return { user, userTempId }
-  }
 
   async joinRoom(
     payload: JoinRoomPayload,
@@ -49,9 +25,11 @@ export class RoomService {
     const { roomId, roomName } = payload
     const userId = await clientManager.getUserBySocketId(socket.id)
     const dbUserId = socket.data.dbUserId
+
     if (!userId) return { success: false, error: 'User not identified' }
 
     let room = await this.roomRepository.findOne({ where: { id: roomId } })
+
     if (!room) {
       room = this.roomRepository.create({
         id: roomId,
@@ -68,8 +46,12 @@ export class RoomService {
     const existingUserRoom = await this.userRoomRepository.findOne({
       where: { userId: dbUserId, roomId },
     })
+
     if (!existingUserRoom) {
-      await this.userRoomRepository.save({ userId: dbUserId, roomId })
+      await this.userRoomRepository.save({
+        userId: dbUserId,
+        roomId,
+      })
     }
 
     server.to(roomId).emit('message', {
@@ -88,6 +70,7 @@ export class RoomService {
   ) {
     const { roomId } = payload
     const userId = await clientManager.getUserBySocketId(socket.id)
+
     if (!userId) return { success: false, error: 'User not identified' }
 
     socket.leave(roomId)
@@ -108,6 +91,7 @@ export class RoomService {
   ) {
     const rooms = await clientManager.getUserRooms(userId)
     if (!rooms) return
+
     rooms.forEach((roomId) => {
       server.to(roomId).emit('message', {
         userId: 'system',

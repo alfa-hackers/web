@@ -14,8 +14,9 @@ import { ClientManagerService } from 'socket/client-manager.service'
 import { AIService } from 'socket/ai.service'
 import { User } from 'domain/user.entity'
 import { JoinRoomPayload, SendMessagePayload } from 'socket/socket.interface'
-import { RoomService } from 'socket/services/room.service'
+import { RoomService } from 'socket/services/room/room.service'
 import { MessageService } from 'socket/services/message.service'
+import { RoomConnectionService } from './services/room/room-connection.service'
 
 @WebSocketGateway({
   cors: { origin: '*', credentials: true },
@@ -29,14 +30,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly aiService: AIService,
     private readonly roomService: RoomService,
     private readonly messageService: MessageService,
+    private readonly roomconnectionService: RoomConnectionService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
   async handleConnection(socket: Socket) {
-    const { user, userTempId } = await this.roomService.handleConnection(
-      socket,
-      this.userRepository,
-    )
+    const { user, userTempId } = await this.roomconnectionService.handleConnection(socket)
 
     const userId = await this.clientManager.createUser(socket.id)
     socket.data.userTempId = userTempId

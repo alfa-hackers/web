@@ -34,10 +34,9 @@ class SocketApi {
         userId: string
         message: string
         chatId?: string
-        fileUrl?: string // Добавлено поле fileUrl
+        fileUrl?: string
       }) => {
         if (data.userId === 'assistant' && this.dispatch) {
-          // Используем новый thunk для обработки сообщения с файлом
           this.dispatch(
             processAssistantMessageWithFile(data.message, data.fileUrl) as any
           )
