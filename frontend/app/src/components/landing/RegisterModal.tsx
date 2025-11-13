@@ -106,8 +106,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
   return (
     <div className="modal-overlay">
-     <div className="btn-container">
-       <button className="modal-btn-exit" onClick={onClose}>
+      <div className="btn-container">
+       <button className="modal-btn-exit" onClick={handleClose}>
          ✕
        </button>
      </div>

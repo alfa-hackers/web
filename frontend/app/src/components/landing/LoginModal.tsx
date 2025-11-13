@@ -79,7 +79,12 @@ const LoginModal: React.FC<LoginModalProps> = ({
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay">
+      <div className="btn-container">
+       <button className="modal-btn-exit" onClick={handleClose}>
+         ✕
+       </button>
+     </div>
       <div
         className="modal-content-wrapper"
         onClick={(e) => e.stopPropagation()}
