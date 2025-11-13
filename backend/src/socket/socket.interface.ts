@@ -6,6 +6,10 @@ export interface SendMessagePayload {
   attachments?: FileAttachment[]
   messageFlag?: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist' | 'business'
   temperature?: number
+  topP?: number
+  frequencyPenalty?: number
+  presencePenalty?: number
+  stopSequences?: string[]
 }
 
 export interface JoinRoomPayload {

@@ -24,6 +24,8 @@ import { AuthModule } from 'controllers/auth/auth.module'
 import { PowerpointResponseService } from './services/responses/powerpoint-reponse.service'
 import { ChecklistResponseService } from './services/responses/checklist-response.service'
 import { PowerPointProcessService } from './services/payloads/powerpoint-process.service'
+import { ResponseGeneratorService } from './services/messages/response-generator.service'
+import { AttachmentProcessorService } from './services/messages/attachment-processor.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
@@ -47,6 +49,8 @@ import { PowerPointProcessService } from './services/payloads/powerpoint-process
     PowerpointResponseService,
     ChecklistResponseService,
     PowerPointProcessService,
+    ResponseGeneratorService,
+    AttachmentProcessorService,
   ],
   exports: [ClientManagerService],
 })
