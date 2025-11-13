@@ -60,7 +60,7 @@
 
 
 .modal-btn-exit {
-  font-size: 32px;
+  font-size: clamp(1.5rem, 0.6vw, 2rem);
   color: $color-dark;
   cursor: pointer;
 }

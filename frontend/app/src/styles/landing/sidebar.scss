@@ -71,11 +71,11 @@
       border-radius: $radius-md;
       cursor: pointer;
       transition: background 0.2s;
-      font-size: 14px;
+      font-size: clamp(0.8rem, 0.6vw, 1.2rem);
       position: relative;
 
       .chat-icon {
-        font-size: 16px;
+        font-size: clamp(1rem, 0.6vw, 1.2rem);
       }
 
       .chat-title {
@@ -97,7 +97,7 @@
         color: $color-alfa;
         border-radius: $radius-sm;
         cursor: pointer;
-        font-size: 20px;
+        font-size: clamp(1.5rem, 0.6vw, 2rem);
         line-height: 1;
         opacity: 0;
         transition: $transition-fast;

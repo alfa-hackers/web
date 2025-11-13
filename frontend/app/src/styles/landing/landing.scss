@@ -14,7 +14,6 @@
 
 .header-actions {
   display: flex;
-  padding: 12px;
   justify-content: flex-end;
   gap: 10px;
   position: absolute;
@@ -37,9 +36,9 @@
   border: none;
   border-radius: $radius-md;
   color: $color-white;
-  font-size: 24px;
-  width: 44px;
-  height: 44px;
+  font-size: clamp(1rem, 0.6vw, 1.5rem);
+  width: 2rem;
+  height: 2rem;
   cursor: pointer;
   transition: $transition-fast;
 
@@ -55,9 +54,9 @@
   border: none;
   border-radius: $radius-md;
   color: $color-white;
-  font-size: 24px;
-  width: 44px;
-  height: 44px;
+  font-size: clamp(1rem, 0.6vw, 1.5rem);
+  width: 2rem;
+  height: 2rem;
   cursor: pointer;
   transition: $transition-fast;
 
