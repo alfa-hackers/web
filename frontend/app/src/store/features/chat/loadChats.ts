@@ -108,6 +108,5 @@ export const loadChats = createAsyncThunk('chat/loadChats', async () => {
     })
   )
 
-    return chatsWithMessages
-  }
-)
+  return chatsWithMessages
+})
