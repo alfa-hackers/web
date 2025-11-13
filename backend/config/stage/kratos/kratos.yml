@@ -57,7 +57,7 @@ session:
   lifespan: 768h
   cookie:
     domain: localhost
-    same_site: Lax
+    sameSite: 'none',
     path: /
 
 log:

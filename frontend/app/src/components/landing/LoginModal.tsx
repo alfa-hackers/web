@@ -5,7 +5,7 @@ import '../../styles/landing/modal.scss'
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess?: () => void
+  onSuccess?: () => void // вызывается после успешного входа
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
@@ -28,25 +28,14 @@ const LoginModal: React.FC<LoginModalProps> = ({
   })
 
   const validateForm = () => {
-    const errors = {
-      username: '',
-      email: '',
-      password: '',
-    }
+    const errors = { username: '', email: '', password: '' }
 
-    if (!formData.username.trim()) {
-      errors.username = 'Username cannot be empty'
-    }
-
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!formData.username.trim()) errors.username = 'Username cannot be empty'
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       errors.email = 'Invalid email format'
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password cannot be empty'
-    } else if (formData.password.length < 6) {
+    if (!formData.password) errors.password = 'Password cannot be empty'
+    else if (formData.password.length < 6)
       errors.password = 'Password must be at least 6 characters'
-    }
 
     setValidationErrors(errors)
     return !errors.username && !errors.email && !errors.password
@@ -55,17 +44,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-
     setValidationErrors((prev) => ({ ...prev, [name]: '' }))
     if (error) clearError()
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     const success = await login({
       username: formData.username,
@@ -74,9 +59,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
     })
 
     if (success) {
+      // сброс формы
       setFormData({ username: '', email: '', password: '' })
       setValidationErrors({ username: '', email: '', password: '' })
 
+      // ✅ вызываем коллбек onSuccess после успешного логина
       if (onSuccess) {
         onSuccess()
       } else {

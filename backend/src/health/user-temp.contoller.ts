@@ -1,14 +1,32 @@
-import { Controller, Get, Req } from '@nestjs/common'
-import { Public } from 'common/decorators/public.decorator'
+import { Controller, Get, Req, HttpCode, HttpStatus, Logger } from '@nestjs/common'
 import { FastifyRequest } from 'fastify'
+import { AuthService } from 'controllers/auth/services'
 
 @Controller('user-temp')
 export class UserTempController {
-  @Public()
-  @Get()
-  async getUserTempId(@Req() req: FastifyRequest) {
-    const session = req.session
+  constructor(private readonly authService: AuthService) {}
 
-    return { userTempId: session.user_temp_id }
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getUserTempId(@Req() req: FastifyRequest) {
+    try {
+      let userId: string | null = null
+
+      if (req.headers.cookie) {
+        const currentUser = await this.authService.getCurrentUser(req)
+        if (currentUser?.id) {
+          userId = currentUser.id
+        }
+      }
+
+      if (!userId) {
+        userId = req.session?.user_temp_id || null
+      }
+
+      return { userTempId: userId }
+    } catch (error) {
+      Logger.error('Error fetching userTempId', error)
+      return { userTempId: null }
+    }
   }
 }

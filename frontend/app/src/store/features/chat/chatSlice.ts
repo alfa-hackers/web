@@ -151,6 +151,12 @@ const chatSlice = createSlice({
       state.chats = state.chats.filter((chat) => chat.id !== action.payload)
       if (state.activeChat === action.payload) state.activeChat = null
     },
+
+    resetChats: (state) => {
+      state.chats = []
+      state.activeChat = null
+      state.isCreatingNew = false
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadChats.fulfilled, (state, action) => {
@@ -169,6 +175,7 @@ export const {
   setActiveChat,
   setCreatingNew,
   deleteChat,
+  resetChats,
 } = chatSlice.actions
 
 export default chatSlice.reducer
