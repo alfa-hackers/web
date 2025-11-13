@@ -7,7 +7,6 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
-  // Преобразуем base64 в Blob URL для скачивания
   const getDownloadUrl = (attachment: any) => {
     try {
       const byteString = atob(attachment.data.split(',')[1] || attachment.data)

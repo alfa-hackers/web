@@ -64,6 +64,7 @@ class SocketApi {
           message: string
           chatId?: string
           fileUrl?: string
+          responseType?: string
         }) => {
           if (data.userId === 'assistant' && this.dispatch) {
             this.dispatch(
