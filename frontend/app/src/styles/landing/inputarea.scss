@@ -14,7 +14,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     padding: 0 20px;
   }
 
@@ -28,7 +28,7 @@
     animation: pulse 2s ease-in-out infinite;
 
     &.centered {
-      max-width: 650px;
+      max-width: 700px;
     }
 
     &.connected {
@@ -95,7 +95,7 @@
     align-items: center;
     background-color: $color-bg;
     padding: 10px;
-    max-width: 750px;
+    max-width: 800px;
 
     .format-label {
       white-space: nowrap;
