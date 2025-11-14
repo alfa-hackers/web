@@ -1,4 +1,5 @@
 @import '../Global/variables';
+@import '../landing/formatdropdown.scss';
 
 .input-area {
   padding: 20px;
@@ -88,65 +89,6 @@
     }
   }
 
-  .format-selector {
-    display: flex;
-    align-items: center;
-    background-color: $color-bg;
-    padding: 10px;
-    max-width: 800px;
-
-    .format-label {
-      white-space: nowrap;
-      margin-right: 8px;
-      color: $color-text;
-      font-family: $font-family-base;
-    }
-
-    .format-options {
-      display: flex;
-      flex-flow: row wrap;
-      width: 100%;
-      gap: 2%;
-    }
-
-    .format-badge {
-      display: flex;
-      align-items: center;
-      gap: 5%;
-      padding: 6px 10px;
-      cursor: pointer;
-      transition: $transition-fast;
-
-      .format-text {
-        color: $color-text;
-      }
-
-      .format-icon {
-        color: $color-text;
-      }
-
-      &:hover {
-        background: $color-accent-hover;
-        border-color: $color-accent-hover;
-        color: $color-white;
-      }
-
-      &.active {
-        background: $color-accent;
-        color: $color-white;
-        border-color: $color-accent;
-      }
-    }
-
-    button.format-badge {
-      border-radius: $radius-sm;
-      width: 20%;
-      height: 6vh;
-      max-height: 30px;
-      font-size: 14px;
-    }
-  }
-
   .input-wrapper {
     width: 100%;
     max-width: 800px;
@@ -193,11 +135,11 @@
   }
 
   button {
-    width: 44px;
-    height: 44px;
+    width: 3rem;
+    height: 3rem;
     background: $color-text-muted;
     border: none;
-    border-radius: $radius-lg;
+    border-radius: calc($radius-lg + 0.25rem);
     color: $color-sidebar-bg;
     font-size: 20px;
     font-weight: 500;

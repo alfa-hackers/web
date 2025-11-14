@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react'
-import '../../styles/landing/inputarea.scss'
+import '@/styles/landing/inputarea.scss'
 import {
   FileAttachment,
   MessageFlag,
 } from '../../store/features/chat/chatTypes'
+import FormatDropdown from './FormatDropdown'
 import {
   BUTTON_ICONS,
   FILE_ACCEPT_EXTENSIONS,
@@ -30,6 +31,7 @@ const InputArea: React.FC<InputAreaProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
   const [isDragging, setIsDragging] = useState(false)
+  const [selectedFormat, setSelectedFormat] = useState('text');
 
   const adjustTextareaHeight = () => {
     const textarea = textareaRef.current
@@ -192,25 +194,6 @@ const InputArea: React.FC<InputAreaProps> = ({
         </div>
       )}
 
-      <div className="format-selector">
-        <span className="format-label">Формат ответа:</span>
-        <div className="format-options">
-          {FORMAT_FLAGS.map((flag) => (
-            <button
-              key={flag.value}
-              className={`format-badge ${selectedFlag === flag.value ? 'active' : ''}`}
-              onClick={() => setSelectedFlag(flag.value)}
-              disabled={isInputDisabled}
-              type="button"
-              title={flag.label}
-            >
-              <span className="format-icon">{flag.icon}</span>
-              <span className="format-text">{flag.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className={`input-wrapper ${isDragging ? 'dragging' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -243,6 +226,12 @@ const InputArea: React.FC<InputAreaProps> = ({
           placeholder={getPlaceholder()}
           rows={1}
           disabled={isInputDisabled}
+        />
+
+        <FormatDropdown
+          selectedFlag={selectedFormat}
+          setSelectedFlag={setSelectedFormat}
+          isInputDisabled={isInputDisabled}
         />
 
         <button
