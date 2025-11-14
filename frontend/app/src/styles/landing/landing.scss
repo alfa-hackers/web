@@ -46,6 +46,26 @@
   }
 }
 
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  background: $color-accent;
+  border: none;
+  border-radius: $radius-md;
+  color: $color-white;
+  font-size: clamp(1rem, 0.6vw, 1.5rem);
+  width: 5rem;
+  height: 2rem;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: $color-accent-hover;
+  }
+}
+
 .mobile-menu-btn {
   display: none;
   z-index: 1001;
