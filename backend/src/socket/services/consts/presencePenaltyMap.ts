@@ -20,4 +20,7 @@ export const presencePenaltyMap: Record<string, number> = {
   business: process.env.MODEL_PRESENCE_PENALTY_BUSINESS
     ? parseFloat(process.env.MODEL_PRESENCE_PENALTY_BUSINESS)
     : 0.1,
+  analytics: process.env.MODEL_PRESENCE_PENALTY_ANALYTICS
+    ? parseFloat(process.env.MODEL_PRESENCE_PENALTY_ANALYTICS)
+    : 0.1,
 }

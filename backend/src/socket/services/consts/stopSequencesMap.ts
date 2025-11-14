@@ -20,4 +20,7 @@ export const stopSequencesMap: Record<string, string[]> = {
   business: process.env.MODEL_STOP_SEQUENCES_BUSINESS
     ? JSON.parse(process.env.MODEL_STOP_SEQUENCES_BUSINESS)
     : undefined,
+  analytics: process.env.MODEL_STOP_SEQUENCES_ANALYTICS
+    ? JSON.parse(process.env.MODEL_STOP_SEQUENCES_ANALYTICS)
+    : undefined,
 }

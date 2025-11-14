@@ -14,12 +14,21 @@ export class AIService {
 
   async generateResponse(
     messages: Array<{ role: string; content: string }>,
-    messageType: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist' | 'business',
+    messageType:
+      | 'text'
+      | 'pdf'
+      | 'word'
+      | 'excel'
+      | 'powerpoint'
+      | 'checklist'
+      | 'business'
+      | 'analytics',
     temperature: number = 0.7,
     topP?: number,
     frequencyPenalty?: number,
     presencePenalty?: number,
     stopSequences?: string[],
+    maxTokens?: number,
   ): Promise<AIResponse> {
     const apiUrl =
       this.configService.get<string>('OPENAI_API_URL') ||
@@ -90,6 +99,18 @@ Focus on clarity, actionable insights, and business relevance.
 Output must be plain text with no extra content.`,
         })
         break
+
+      case 'analytics':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that performs market and financial analysis.
+Analyze market trends, financial transactions, investment opportunities, and economic indicators.
+Provide data-driven insights with quantitative metrics when possible.
+Structure analysis with key findings, risk assessment, and actionable recommendations.
+Use clear financial terminology and industry-standard metrics.
+Output must be professional analytical text with no extra content.`,
+        })
+        break
       case 'text':
       default:
         payload.push({ role: 'system', content: '' })
@@ -107,6 +128,7 @@ Output must be plain text with no extra content.`,
           frequency_penalty: frequencyPenalty,
           presence_penalty: presencePenalty,
           stop: stopSequences,
+          max_tokens: maxTokens,
         },
         {
           headers: {

@@ -6,6 +6,7 @@ export type MessageFlag =
   | 'powerpoint'
   | 'checklist'
   | 'business'
+  | 'analytics'
 
 export interface FileAttachment {
   filename: string

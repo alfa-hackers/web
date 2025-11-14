@@ -16,6 +16,7 @@ import {
   frequencyPenaltyMap,
   stopSequencesMap,
   presencePenaltyMap,
+  maxTokensMap,
 } from './consts'
 
 @Injectable()
@@ -46,6 +47,7 @@ export class MessageService {
       frequencyPenalty: customFreqPenalty,
       presencePenalty: customPresPenalty,
       stopSequences: customStopSeq,
+      maxTokens: customMaxTokens,
     } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
     const { userTempId, dbUserId } = socket.data
@@ -87,6 +89,7 @@ export class MessageService {
       const frequencyPenalty = customFreqPenalty ?? frequencyPenaltyMap[messageFlag] ?? 0.0
       const presencePenalty = customPresPenalty ?? presencePenaltyMap[messageFlag] ?? 0.0
       const stopSequences = customStopSeq ?? stopSequencesMap[messageFlag]
+      const maxTokens = customMaxTokens ?? maxTokensMap[messageFlag]
 
       const aiResponse = await aiService.generateResponse(
         combinedMessages,
@@ -96,6 +99,7 @@ export class MessageService {
         frequencyPenalty,
         presencePenalty,
         stopSequences,
+        maxTokens,
       )
 
       const { formattedResponse, responseFileUrl } =

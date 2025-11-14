@@ -20,4 +20,7 @@ export const frequencyPenaltyMap: Record<string, number> = {
   business: process.env.MODEL_FREQUENCY_PENALTY_BUSINESS
     ? parseFloat(process.env.MODEL_FREQUENCY_PENALTY_BUSINESS)
     : 0.3,
+  analytics: process.env.MODEL_FREQUENCY_PENALTY_ANALYTICS
+    ? parseFloat(process.env.MODEL_FREQUENCY_PENALTY_ANALYTICS)
+    : 0.2,
 }

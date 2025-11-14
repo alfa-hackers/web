@@ -15,17 +15,17 @@ export class ChecklistResponseService {
         return withoutNumber
       })
 
-      const checklistText = items.map((item) => `☐ ${item}`).join('\n\n')
+      const checklistText = items.map((item) => `- [ ] ${item}`).join('\n')
 
       const buffer = Buffer.from(checklistText, 'utf-8')
       const base64Data = buffer.toString('base64')
 
-      const filename = `checklist_${Date.now()}.txt`
+      const filename = `checklist_${Date.now()}.md`
 
       const fileUrl = await this.saveMinioService.saveFile(
         {
           filename,
-          mimeType: 'text/plain',
+          mimeType: 'text/markdown',
           data: base64Data,
           size: buffer.length,
         },

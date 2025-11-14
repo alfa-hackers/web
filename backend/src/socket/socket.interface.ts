@@ -4,12 +4,21 @@ export interface SendMessagePayload {
   messageId?: string
   chatId?: string
   attachments?: FileAttachment[]
-  messageFlag?: 'text' | 'pdf' | 'word' | 'excel' | 'powerpoint' | 'checklist' | 'business'
+  messageFlag?:
+    | 'text'
+    | 'pdf'
+    | 'word'
+    | 'excel'
+    | 'powerpoint'
+    | 'checklist'
+    | 'business'
+    | 'analytics'
   temperature?: number
   topP?: number
   frequencyPenalty?: number
   presencePenalty?: number
   stopSequences?: string[]
+  maxTokens: number
 }
 
 export interface JoinRoomPayload {
@@ -62,6 +71,7 @@ export interface FileAttachment {
     | 'application/vnd.ms-powerpoint'
     | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     | 'text/plain'
+    | 'text/markdown'
   data: string
   size: number
 }

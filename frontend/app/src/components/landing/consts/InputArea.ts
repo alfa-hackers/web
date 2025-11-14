@@ -43,6 +43,7 @@ export const FORMAT_FLAGS: {
   { value: 'powerpoint', label: 'PowerPoint', icon: '📈' },
   { value: 'checklist', label: 'Check-list', icon: '✅' },
   { value: 'business', label: 'Business', icon: '💼' },
+  { value: 'analytics', label: 'Analytics', icon: '♨' },
 ]
 
 export const PLACEHOLDERS = {
