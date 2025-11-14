@@ -13,7 +13,7 @@ export const frequencyPenaltyMap: Record<string, number> = {
     : 0,
   powerpoint: process.env.MODEL_FREQUENCY_PENALTY_POWERPOINT
     ? parseFloat(process.env.MODEL_FREQUENCY_PENALTY_POWERPOINT)
-    : 0,
+    : 0.3,
   checklist: process.env.MODEL_FREQUENCY_PENALTY_CHECKLIST
     ? parseFloat(process.env.MODEL_FREQUENCY_PENALTY_CHECKLIST)
     : 0,

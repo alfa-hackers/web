@@ -1,19 +1,20 @@
 import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from 'app.module'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { SwaggerModule } from '@nestjs/swagger'
 import * as cliColor from 'cli-color'
 import { registerFastifyPlugins } from 'session'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 import Fastify from 'fastify'
 import { ZodValidationPipe } from 'common/pipes'
-import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes'
+import { options, swaggerConfig } from './'
 import { Logger } from '@nestjs/common'
 
 export async function bootstrap() {
   const logger = new Logger('Bootstrap')
   const nodeEnv = process.env.NODE_ENV
   let baseUrl
+
   logger.log(cliColor.green('✅ Starting NestJS (Fastify) application...'))
   logger.log('')
 
@@ -40,24 +41,6 @@ export async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe())
 
   await registerFastifyPlugins(app)
-
-  const theme = new SwaggerTheme()
-  const options = {
-    explorer: true,
-    customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK),
-  }
-
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('NestJS API')
-    .setDescription(
-      `
-      NestJS Boilerplate  
-      TypeORM  
-      PostgreSQL
-    `,
-    )
-    .setVersion('6.6.6')
-    .build()
 
   const document = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup('api', app as any, document, options)

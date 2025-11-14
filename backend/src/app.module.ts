@@ -6,7 +6,7 @@ import { DatabaseModule } from 'adapters/database.module'
 import { SocketModule } from 'socket/socket.module'
 import { MessagesModule } from 'controllers/messages/messages.module'
 import { RoomsModule } from 'controllers/rooms/rooms.module'
-import { MinioModule } from 'minio/minio.module'
+import { MinioModule } from 'adapters/minio/minio.module'
 import { HelpersModule } from 'controllers/helpers/helpers.module'
 
 @Module({

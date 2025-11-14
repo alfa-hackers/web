@@ -13,7 +13,7 @@ export const presencePenaltyMap: Record<string, number> = {
     : 0,
   powerpoint: process.env.MODEL_PRESENCE_PENALTY_POWERPOINT
     ? parseFloat(process.env.MODEL_PRESENCE_PENALTY_POWERPOINT)
-    : 0,
+    : 0.2,
   checklist: process.env.MODEL_PRESENCE_PENALTY_CHECKLIST
     ? parseFloat(process.env.MODEL_PRESENCE_PENALTY_CHECKLIST)
     : 0,

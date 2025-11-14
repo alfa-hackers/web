@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { FileAttachment } from '../socket.interface'
-import { MinioService } from 'minio/minio.service'
+import { MinioService } from 'adapters/minio/minio.service'
 import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
