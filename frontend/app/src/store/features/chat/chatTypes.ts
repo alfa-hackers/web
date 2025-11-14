@@ -1,4 +1,12 @@
-export type MessageFlag = 'text' | 'pdf' | 'word' | 'excel'
+export type MessageFlag =
+  | 'text'
+  | 'pdf'
+  | 'word'
+  | 'excel'
+  | 'powerpoint'
+  | 'checklist'
+  | 'business'
+  | 'analytics'
 
 export interface FileAttachment {
   filename: string
@@ -9,6 +17,11 @@ export interface FileAttachment {
     | 'application/vnd.ms-excel'
     | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     | 'application/vnd.oasis.opendocument.spreadsheet'
+    | 'application/vnd.ms-powerpoint'
+    | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    | 'text/plain'
+    | 'application/octet-stream'
+
   data: string
   size: number
 }

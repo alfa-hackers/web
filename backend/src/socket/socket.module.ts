@@ -10,7 +10,7 @@ import { Message } from 'domain/message.entity'
 import { Room } from 'domain/room.entity'
 import { UserRoom } from 'domain/user-room.entity'
 import { MessagesService } from 'controllers/messages/services/messages.service'
-import { MinioService } from 'minio/minio.service'
+import { MinioService } from 'adapters/minio/minio.service'
 import { LoadContextService } from './services/load-context.service'
 import { SaveMinioService } from './services/save-minio.service'
 import { ExcelResponseService } from './services/responses/excel-response.service'
@@ -21,6 +21,11 @@ import { PdfProcessService } from './services/payloads/pdf-process.service'
 import { ExcelProcessService } from './services/payloads/excel-process.service'
 import { RoomConnectionService } from './services/room/room-connection.service'
 import { AuthModule } from 'controllers/auth/auth.module'
+import { PowerpointResponseService } from './services/responses/powerpoint-reponse.service'
+import { ChecklistResponseService } from './services/responses/checklist-response.service'
+import { PowerPointProcessService } from './services/payloads/powerpoint-process.service'
+import { ResponseGeneratorService } from './services/messages/response-generator.service'
+import { AttachmentProcessorService } from './services/messages/attachment-processor.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Message, Room, UserRoom]), AuthModule],
@@ -41,6 +46,11 @@ import { AuthModule } from 'controllers/auth/auth.module'
     PdfProcessService,
     ExcelProcessService,
     RoomConnectionService,
+    PowerpointResponseService,
+    ChecklistResponseService,
+    PowerPointProcessService,
+    ResponseGeneratorService,
+    AttachmentProcessorService,
   ],
   exports: [ClientManagerService],
 })

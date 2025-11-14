@@ -23,9 +23,13 @@ export const ALLOWED_FILE_TYPES = [
   'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/vnd.oasis.opendocument.spreadsheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
 ]
 
-export const FILE_ACCEPT_EXTENSIONS = '.pdf,.doc,.docx'
+export const FILE_ACCEPT_EXTENSIONS =
+  '.pdf,.doc,.docx,.xls,.xlsx,.ods,.ppt,.pptx,.txt'
 
 export const FORMAT_FLAGS: {
   value: MessageFlag
@@ -36,6 +40,10 @@ export const FORMAT_FLAGS: {
   { value: 'pdf', label: 'PDF', icon: '📄' },
   { value: 'word', label: 'Word', icon: '📘' },
   { value: 'excel', label: 'Excel', icon: '📊' },
+  { value: 'powerpoint', label: 'PowerPoint', icon: '📈' },
+  { value: 'checklist', label: 'Check-list', icon: '✅' },
+  { value: 'business', label: 'Business', icon: '💼' },
+  { value: 'analytics', label: 'Analytics', icon: '♨' },
 ]
 
 export const PLACEHOLDERS = {

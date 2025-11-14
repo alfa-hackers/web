@@ -14,8 +14,21 @@ export class AIService {
 
   async generateResponse(
     messages: Array<{ role: string; content: string }>,
+    messageType:
+      | 'text'
+      | 'pdf'
+      | 'word'
+      | 'excel'
+      | 'powerpoint'
+      | 'checklist'
+      | 'business'
+      | 'analytics',
     temperature: number = 0.7,
-    messageType: 'text' | 'pdf' | 'word' | 'excel' = 'text',
+    topP?: number,
+    frequencyPenalty?: number,
+    presencePenalty?: number,
+    stopSequences?: string[],
+    maxTokens?: number,
   ): Promise<AIResponse> {
     const apiUrl =
       this.configService.get<string>('OPENAI_API_URL') ||
@@ -39,27 +52,65 @@ Do NOT include explanations, comments, extra words, or formatting.
 Output must be clean, readable text with no extra content.`,
         })
         break
-
       case 'word':
         payload.push({
           role: 'system',
           content: `You are an AI that processes Word documents.
-                Generate ONLY plain text summary from the Word content.
-                Do NOT include explanations, comments, extra words, or formatting.
-                Output must be clean, readable text with no extra content.`,
+Generate ONLY plain text summary from the Word content.
+Do NOT include explanations, comments, extra words, or formatting.
+Output must be clean, readable text with no extra content.`,
         })
         break
-
       case 'excel':
         payload.push({
           role: 'system',
           content: `You are an AI that processes Excel data.
-            Generate ONLY raw CSV text from the Excel content.
-            Do NOT include explanations, comments, extra words, or formatting.
-            Output must be pure CSV, with commas separating values and newlines separating rows.`,
+Generate ONLY raw CSV text from the Excel content.
+Do NOT include explanations, comments, extra words, or formatting.
+Output must be pure CSV, with commas separating values and newlines separating rows.`,
+        })
+        break
+      case 'powerpoint':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that creates PowerPoint presentations.
+Generate ONLY plain text content for slides.
+Each slide content should be separated by double newlines.
+Do NOT include explanations, comments, slide numbers, or formatting instructions.
+Output must be clean, presentation-ready text with no extra content.`,
+        })
+        break
+      case 'checklist':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that creates checklists.
+Generate ONLY a list of checklist items, one per line.
+Do NOT include explanations, comments, checkboxes, or formatting.
+Output must be plain text items with no extra content.`,
+        })
+        break
+      case 'business':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that creates business content.
+Generate professional, concise, and structured business text.
+Do NOT include explanations, comments, or extra formatting.
+Focus on clarity, actionable insights, and business relevance.
+Output must be plain text with no extra content.`,
         })
         break
 
+      case 'analytics':
+        payload.push({
+          role: 'system',
+          content: `You are an AI that performs market and financial analysis.
+Analyze market trends, financial transactions, investment opportunities, and economic indicators.
+Provide data-driven insights with quantitative metrics when possible.
+Structure analysis with key findings, risk assessment, and actionable recommendations.
+Use clear financial terminology and industry-standard metrics.
+Output must be professional analytical text with no extra content.`,
+        })
+        break
       case 'text':
       default:
         payload.push({ role: 'system', content: '' })
@@ -69,7 +120,16 @@ Output must be clean, readable text with no extra content.`,
     try {
       const response = await axios.post(
         apiUrl,
-        { model, messages: payload, temperature },
+        {
+          model,
+          messages: payload,
+          temperature,
+          top_p: topP,
+          frequency_penalty: frequencyPenalty,
+          presence_penalty: presencePenalty,
+          stop: stopSequences,
+          max_tokens: maxTokens,
+        },
         {
           headers: {
             Authorization: `Bearer ${apiKey}`,

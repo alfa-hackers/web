@@ -8,12 +8,16 @@ import { AIService } from '../ai.service'
 import { SendMessagePayload } from '../socket.interface'
 import { LoadContextService } from './load-context.service'
 import { SaveMinioService } from './save-minio.service'
-import { PdfResponseService } from './responses/pdf-response.service'
-import { WordResponseService } from './responses/word-response.service'
-import { ExcelResponseService } from './responses/excel-response.service'
-import { PdfProcessService } from './payloads/pdf-process.service'
-import { WordProcessService } from './payloads/word-process.service'
-import { ExcelProcessService } from './payloads/excel-process.service'
+import { AttachmentProcessorService } from './messages/attachment-processor.service'
+import { ResponseGeneratorService } from './messages/response-generator.service'
+import {
+  temperatureMap,
+  topPMap,
+  frequencyPenaltyMap,
+  stopSequencesMap,
+  presencePenaltyMap,
+  maxTokensMap,
+} from './consts'
 
 @Injectable()
 export class MessageService {
@@ -22,12 +26,8 @@ export class MessageService {
     private readonly messageRepository: Repository<Message>,
     private readonly loadContextService: LoadContextService,
     private readonly saveMinioService: SaveMinioService,
-    private readonly pdfResponseService: PdfResponseService,
-    private readonly wordResponseService: WordResponseService,
-    private readonly excelResponseService: ExcelResponseService,
-    private readonly pdfProcessService: PdfProcessService,
-    private readonly wordProcessService: WordProcessService,
-    private readonly excelProcessService: ExcelProcessService,
+    private readonly attachmentProcessor: AttachmentProcessorService,
+    private readonly responseGenerator: ResponseGeneratorService,
   ) {}
 
   async handleMessage(
@@ -37,7 +37,18 @@ export class MessageService {
     server,
     aiService: AIService,
   ) {
-    const { roomId, message, attachments, messageFlag = 'text', temperature: customTemp } = payload
+    const {
+      roomId,
+      message,
+      attachments,
+      messageFlag = 'text',
+      temperature: customTemp,
+      topP: customTopP,
+      frequencyPenalty: customFreqPenalty,
+      presencePenalty: customPresPenalty,
+      stopSequences: customStopSeq,
+      maxTokens: customMaxTokens,
+    } = payload
     const userId = clientManager.getUserBySocketId(socket.id)
     const { userTempId, dbUserId } = socket.data
 
@@ -49,24 +60,9 @@ export class MessageService {
 
     if (attachments?.length) {
       for (const attachment of attachments) {
-        let extractedText = ''
-        switch (attachment.mimeType) {
-          case 'application/pdf':
-            extractedText = await this.pdfProcessService.process(attachment)
-            break
-          case 'application/msword':
-            extractedText = await this.wordProcessService.processDoc(attachment)
-            break
-          case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            extractedText = await this.wordProcessService.processDocx(attachment)
-            break
-          case 'application/vnd.ms-excel':
-          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-          case 'application/vnd.oasis.opendocument.spreadsheet':
-            extractedText = await this.excelProcessService.process(attachment)
-            break
-        }
+        const extractedText = await this.attachmentProcessor.processAttachment(attachment)
         const savedFileUrl = await this.saveMinioService.saveFile(attachment, roomId)
+
         if (savedFileUrl) fileUrl = savedFileUrl
         if (extractedText) processedContent += `\n\n${extractedText}`
       }
@@ -87,49 +83,27 @@ export class MessageService {
 
     try {
       const combinedMessages = await this.loadContextService.loadContext(roomId, processedContent)
-      const temperatureMap: Record<string, number> = {
-        text: process.env.MODEL_TEMPERATURE_TEXT
-          ? parseFloat(process.env.MODEL_TEMPERATURE_TEXT)
-          : 1.4,
-        pdf: process.env.MODEL_TEMPERATURE_PDF
-          ? parseFloat(process.env.MODEL_TEMPERATURE_PDF)
-          : 0.6,
-        word: process.env.MODEL_TEMPERATURE_WORD
-          ? parseFloat(process.env.MODEL_TEMPERATURE_WORD)
-          : 1.2,
-        excel: process.env.MODEL_TEMPERATURE_EXCEL
-          ? parseFloat(process.env.MODEL_TEMPERATURE_EXCEL)
-          : 0.6,
-      }
 
-      const temperature = customTemp ?? temperatureMap[messageFlag] ?? 0.7
+      const temperature = customTemp ?? temperatureMap[messageFlag] ?? 1
+      const topP = customTopP ?? topPMap[messageFlag] ?? 1
+      const frequencyPenalty = customFreqPenalty ?? frequencyPenaltyMap[messageFlag] ?? 0.0
+      const presencePenalty = customPresPenalty ?? presencePenaltyMap[messageFlag] ?? 0.0
+      const stopSequences = customStopSeq ?? stopSequencesMap[messageFlag]
+      const maxTokens = customMaxTokens ?? maxTokensMap[messageFlag]
+
       const aiResponse = await aiService.generateResponse(
         combinedMessages,
-        temperature,
         messageFlag,
+        temperature,
+        topP,
+        frequencyPenalty,
+        presencePenalty,
+        stopSequences,
+        maxTokens,
       )
 
-      let formattedResponse: string
-      let responseFileUrl: string | null = null
-
-      switch (messageFlag) {
-        case 'pdf':
-          responseFileUrl = await this.pdfResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
-          break
-        case 'word':
-          responseFileUrl = await this.wordResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
-          break
-        case 'excel':
-          responseFileUrl = await this.excelResponseService.generate(aiResponse.content, roomId)
-          formattedResponse = aiResponse.content
-          break
-        case 'text':
-        default:
-          formattedResponse = aiResponse.content
-          break
-      }
+      const { formattedResponse, responseFileUrl } =
+        await this.responseGenerator.generateResponseByFlag(messageFlag, aiResponse, roomId)
 
       server.to(roomId).emit('message', {
         userId: 'assistant',
@@ -149,9 +123,17 @@ export class MessageService {
         response_type: messageFlag,
       })
 
-      return { success: true, responseType: messageFlag, fileUrl: responseFileUrl }
+      return {
+        success: true,
+        responseType: messageFlag,
+        fileUrl: responseFileUrl,
+      }
     } catch (error) {
-      server.to(roomId).emit('message', { userId: 'system', message: `AI Error: ${error.message}` })
+      server.to(roomId).emit('message', {
+        userId: 'system',
+        message: `AI Error: ${error.message}`,
+      })
+
       return { success: false, error: error.message }
     }
   }

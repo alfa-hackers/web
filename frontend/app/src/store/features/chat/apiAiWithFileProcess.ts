@@ -29,6 +29,7 @@ export const processAssistantMessageWithFile =
         'application/vnd.ms-excel',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.oasis.opendocument.spreadsheet',
+        'application/octet-stream',
       ]
 
       if (!allowedMimeTypes.includes(mimeType as FileAttachment['mimeType']))
