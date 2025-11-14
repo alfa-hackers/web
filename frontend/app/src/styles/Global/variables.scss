@@ -22,3 +22,12 @@ $radius-lg: 20px;
 $radius-xl: 24px;
 $transition-fast: all 0.2s;
 $transition-medium: all 0.3s ease;
+
+@mixin hide-scrollbar() {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -29,6 +29,7 @@ const InputArea: React.FC<InputAreaProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selectedFlag, setSelectedFlag] = useState<MessageFlag>('text')
+  const [isDragging, setIsDragging] = useState(false)
 
   const adjustTextareaHeight = () => {
     const textarea = textareaRef.current
@@ -123,6 +124,46 @@ const InputArea: React.FC<InputAreaProps> = ({
     return BUTTON_ICONS.disconnected
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
+
+    const newAttachments: FileAttachment[] = []
+    const error = validateFile(file)
+
+    if (error) {
+      alert(error)
+      return
+    }
+
+    const base64 = await convertFileToBase64(file)
+
+    newAttachments.push({
+      filename: file.name,
+      mimeType: file.type as FileAttachment['mimeType'],
+      data: base64,
+      size: file.size,
+    })
+
+    onAttachmentsChange([...attachments, ...newAttachments])
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const isInputDisabled = !isConnected || isWaitingForResponse
   const isSendDisabled = !inputValue.trim() || isInputDisabled
 
@@ -170,7 +211,11 @@ const InputArea: React.FC<InputAreaProps> = ({
         </div>
       </div>
 
-      <div className="input-wrapper">
+      <div className={`input-wrapper ${isDragging ? 'dragging' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <input
           ref={fileInputRef}
           type="file"
