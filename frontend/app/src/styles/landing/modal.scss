@@ -29,6 +29,11 @@
   background-color: $color-alfa-light;
   border-radius: $radius-lg;
   animation: fadeIn 0.3s ease;
+
+  form .error-banner {
+    color: $color-alfa;
+    padding: 1rem;
+  }
 }
 
 .modal-header {
@@ -92,6 +97,13 @@ form {
 
   &:focus {
     border-color: $color-dark;
+  }
+}
+
+.form-group {
+  .error-message {
+    color: $color-alfa;
+    margin-left: 1rem;
   }
 }
 
