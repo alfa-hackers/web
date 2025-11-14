@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/alfa-hackers/backend/graph/badge.svg?token=PIHG47NVOK)](https://codecov.io/gh/alfa-hackers/backend)
+
 # Install deps:
 
 ```
