@@ -187,10 +187,12 @@
         padding: 10px 12px;
       }
 
-      button {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+      .format-selector {
+
+        button.format-badge {
+          margin: 0;
+          font-size: 0.7rem;
+        }
       }
     }
   }

@@ -14,7 +14,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     padding: 0 20px;
   }
 
@@ -28,7 +28,7 @@
     animation: pulse 2s ease-in-out infinite;
 
     &.centered {
-      max-width: 650px;
+      max-width: 700px;
     }
 
     &.connected {
@@ -48,6 +48,9 @@
     margin: 10px;
     background-color: $color-white;
     border-radius: $radius-sm;
+    max-height: 100px;
+    overflow-y: scroll;
+    @include hide-scrollbar();
     border: 1px solid $color-border-light;
     box-shadow: 0 2px 6px rgb(0, 0, 0, 0.1);
 
@@ -61,11 +64,6 @@
       border: 1px solid $color-border-light;
       transition: $transition-fast;
 
-      &:hover {
-        background-color: $color-accent-hover;
-        border-color: $color-accent;
-      }
-
       .attachment-name {
         font-size: 14px;
         color: $color-text;
@@ -78,13 +76,13 @@
       .remove-attachment {
         background: none;
         border: none;
-        color: $color-alfa;
+        color: $color-dark;
         font-size: 16px;
         cursor: pointer;
         transition: $transition-fast;
 
         &:hover {
-          color: $color-alfa-hover;
+          color: $color-alfa;
         }
       }
     }
@@ -95,7 +93,7 @@
     align-items: center;
     background-color: $color-bg;
     padding: 10px;
-    max-width: 750px;
+    max-width: 800px;
 
     .format-label {
       white-space: nowrap;
