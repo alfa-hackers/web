@@ -2,22 +2,17 @@ version: '3.8'
 
 services:
   caddy:
-    image: caddy:latest
+    image: jwilder/nginx-proxy
     restart: always
-    container_name: caddy
+    container_name: nginx-proxy
     cap_add:
       - NET_ADMIN
     ports:
       - 80:80
-      - 443:443
-      - 443:443/udp
     volumes:
-      - $PWD/config/prod/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - $PWD/site:/srv
-      - caddy_data:/data
-      - caddy_config:/config
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
-      - caddy
+      - nginx
     depends_on:
       - app
       - nestjs
@@ -28,13 +23,13 @@ services:
       dockerfile: Dockerfile
     container_name: app
     restart: always
-    ports:
-      - '3001:3001'
     environment:
+      - VIRTUAL_HOST=dev.whirav.ru
+      - VIRTUAL_PORT=3001
       - REACT_APP_SOCKET_URL=wss://api.whirav.ru
       - NODE_ENV=production
     networks:
-      - caddy
+      - nginx
 
   redis:
     image: 'docker.io/bitnami/redis:latest'
@@ -48,7 +43,7 @@ services:
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
     networks:
-      - caddy
+      - nginx
     logging:
       driver: 'json-file'
       options:
@@ -76,7 +71,7 @@ services:
     volumes:
       - pg_data:/bitnami/postgresql
     networks:
-      - caddy
+      - nginx
     logging:
       driver: 'json-file'
       options:
@@ -107,7 +102,7 @@ services:
       - postgres
     container_name: 'nestjs'
     networks:
-      - caddy
+      - nginx
     restart: always
     logging:
       driver: 'json-file'
@@ -137,7 +132,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - caddy
+      - nginx
     restart: always
     logging:
       driver: 'json-file'
@@ -159,12 +154,10 @@ volumes:
   pg_data:
   static_data:
   uploads_data:
-  caddy_data:
-  caddy_config:
   minio_data:
 
 networks:
-  caddy:
+  nginx:
     driver: bridge
     ipam:
       driver: default
