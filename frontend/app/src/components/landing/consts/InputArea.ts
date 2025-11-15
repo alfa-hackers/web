@@ -36,15 +36,15 @@ export const FORMAT_FLAGS: {
   label: string
   icon: string
 }[] = [
-  { value: 'text', label: 'Текст', icon: '📝' },
-  { value: 'pdf', label: 'PDF', icon: '📄' },
-  { value: 'word', label: 'Word', icon: '📘' },
-  { value: 'excel', label: 'Excel', icon: '📊' },
-  { value: 'powerpoint', label: 'PowerPoint', icon: '📈' },
-  { value: 'checklist', label: 'Check-list', icon: '✅' },
-  { value: 'business', label: 'Business', icon: '💼' },
-  { value: 'analytics', label: 'Analytics', icon: '♨' },
-]
+    { value: 'text', label: 'Текст', icon: '📝' },
+    { value: 'pdf', label: 'PDF', icon: '📄' },
+    { value: 'word', label: 'Word', icon: '📘' },
+    { value: 'excel', label: 'Excel', icon: '📊' },
+    { value: 'powerpoint', label: 'PowerPoint', icon: '📈' },
+    { value: 'checklist', label: 'Check-list', icon: '✅' },
+    { value: 'business', label: 'Business', icon: '💼' },
+    { value: 'analytics', label: 'Analytics', icon: '♨' },
+  ]
 
 export const PLACEHOLDERS = {
   waiting: 'Ожидание ответа...',
