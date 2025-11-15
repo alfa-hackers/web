@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../../store/store'
+import { useAuth } from '@/store/features/auth/useAuth'
 import {
   setActiveChat,
   setCreatingNew,
@@ -32,6 +33,7 @@ const ChatLanding: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { sendMessage, isConnected } = useWebSocket()
+  const { logout } = useAuth()
 
   useEffect(() => {
     dispatch(initializeAuth())
@@ -108,14 +110,22 @@ const ChatLanding: React.FC = () => {
     <div className="chat-landing">
       <div className="header-actions">
         {!isAuthenticated && (
-          <>
-            <button
-              className="login-btn"
-              onClick={() => setLoginModalOpen(!loginModalOpen)}
-            >
-              🔒
-            </button>
-          </>
+          <button
+            className="login-btn"
+            onClick={() => setLoginModalOpen(!loginModalOpen)}
+          >
+            🔒
+          </button>
+        )}
+        {isAuthenticated && (
+          <button
+            className="logout-btn"
+            onClick={async () => {
+              await logout();
+            }}
+          >
+            🚪 Выйти
+          </button>
         )}
         <button
           className="mobile-menu-btn"

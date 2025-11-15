@@ -10,12 +10,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ isConnected }) => {
     <div className="welcome">
       <h1>Добро пожаловать</h1>
       <p>Чем я могу вам помочь?</p>
-
-      {!isConnected && (
-        <div className="connection-warning">
-          ⚠️ Нет подключения к серверу
-        </div>
-      )}
     </div>
   )
 }
