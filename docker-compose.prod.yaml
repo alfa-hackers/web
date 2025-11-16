@@ -136,6 +136,7 @@ services:
       - '9001:9001'
     volumes:
       - minio_data:/data
+      - ./certs:/root/.minio/certs:ro
     networks:
       - nginx
     restart: always
