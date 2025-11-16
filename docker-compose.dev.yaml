@@ -81,7 +81,7 @@ services:
     depends_on:
       - postgres
       - redis
-    container_name: 'nestjs-app'
+    container_name: 'nestjs'
     networks:
       - app
     restart: always

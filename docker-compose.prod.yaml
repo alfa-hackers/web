@@ -128,8 +128,11 @@ services:
     image: 'minio/minio'
     container_name: 'minio'
     environment:
+      VIRTUAL_HOST: minio.whirav.ru
+      VIRTUAL_PORT: 9000
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
       TZ: 'Europe/Omsk'
     ports:
       - '${MINIO_PORT}:${MINIO_PORT}'
