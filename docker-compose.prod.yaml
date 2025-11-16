@@ -28,6 +28,8 @@ services:
       - VIRTUAL_PORT=3001
       - REACT_APP_SOCKET_URL=wss://api.whirav.ru
       - NODE_ENV=production
+    ports:
+      - 3001:3001
     networks:
       - nginx
 
@@ -98,6 +100,7 @@ services:
       VIRTUAL_HOST: 'api.whirav.ru'
       VIRTUAL_PORT: '3000'
     ports:
+      - 3000:3000
       - '${BACKEND_PORT}:${BACKEND_PORT}'
     depends_on:
       - redis
