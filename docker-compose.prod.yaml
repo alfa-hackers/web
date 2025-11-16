@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  caddy:
+  nginx:
     image: jwilder/nginx-proxy
     restart: always
     container_name: nginx-proxy
@@ -95,6 +95,7 @@ services:
       - prod.env
     environment:
       TZ: 'Europe/Omsk'
+      VIRTUAL_HOST: 'dev.whirav.ru'
     ports:
       - '${BACKEND_PORT}:${BACKEND_PORT}'
     depends_on:
