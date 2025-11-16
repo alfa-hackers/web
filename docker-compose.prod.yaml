@@ -132,14 +132,12 @@ services:
       VIRTUAL_PORT: 9000
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
-      MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
       TZ: 'Europe/Omsk'
     ports:
       - '${MINIO_PORT}:${MINIO_PORT}'
       - '9001:9001'
     volumes:
       - minio_data:/data
-      - ./certs:/root/.minio/certs:ro
     networks:
       - nginx
     restart: always
