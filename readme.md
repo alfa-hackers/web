@@ -315,10 +315,10 @@ MIT License - см. файл [LICENSE](LICENSE) для подробностей
 
 ## 📞 Контакты
 
-t.me/vwency - backend/frontend, team lead
-t.me/SaCorv - Ответсвенный за сервер
-t.me/SyncI20n - Ответсвенный за UI/UX
-t.me/MurkyShadow -Менеджер
+t.me/vwency - backend/frontend, team lead  
+t.me/SaCorv - Ответсвенный за сервер  
+t.me/SyncI20n - Ответсвенный за UI/UX  
+t.me/MurkyShadow -Менеджер  
 
 - **Сайт**: [https://dev.whirav.ru](https://dev.whirav.ru)
 - **Документация API**: [https://dev.whirav.ru/api](https://dev.whirav.ru/api)
