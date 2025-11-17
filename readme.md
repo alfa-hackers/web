@@ -316,6 +316,9 @@ MIT License - см. файл [LICENSE](LICENSE) для подробностей
 
 ## 📞 Контакты
 
+t.me/vwency
+t.me/SaCorv
+
 - **Сайт**: [https://dev.whirav.ru](https://dev.whirav.ru)
 - **Документация API**: [https://dev.whirav.ru/api](https://dev.whirav.ru/api)
 
