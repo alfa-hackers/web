@@ -319,7 +319,7 @@ t.me/SyncI20n - Ответсвенный за UI/UX
 t.me/MurkyShadow -Менеджер, Product manager, контроль соответсвия требованиям  
 
 - **Сайт**: [https://dev.whirav.ru](https://dev.whirav.ru)
-- **Документация API**: [https://dev.whirav.ru/api](https://dev.whirav.ru/api)
+- **Документация API**: [https://api.whirav.ru/api](https://dev.whirav.ru/api)
 
 
 ![alt text](art/knight-fighting-dragon-depicting-fantasy-battle-mythical-creatures-versus-scene-representing-knights-dragons-battles-stock-371249438.webp)
