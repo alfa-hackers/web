@@ -1,5 +1,8 @@
 # Whirav - Интеллектуальная бизнес-платформа на базе ИИ
 
+# Могут быть баги с исекшим api токенов, тг для оперативной связи
+`t.me/vwency`
+
 [![Продакшн](https://img.shields.io/badge/prod-dev.whirav.ru-blue)](https://dev.whirav.ru)
 [![Лицензия](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
